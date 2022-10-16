@@ -1,0 +1,1 @@
+rootProject.name = "idea-code-analyzer-golang"
