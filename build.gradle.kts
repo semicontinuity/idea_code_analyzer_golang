@@ -13,10 +13,10 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2021.3")
+    version.set("2021.1.1")
     type.set("GO") // Target IDE Platform
 
-    plugins.set(listOf(/* Plugin Dependencies */))
+    plugins.set(listOf("org.jetbrains.plugins.go"))
 }
 
 tasks {
@@ -27,7 +27,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("213")
+        sinceBuild.set("211")
         untilBuild.set("223.*")
     }
 

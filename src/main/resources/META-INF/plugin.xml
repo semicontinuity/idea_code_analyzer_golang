@@ -22,6 +22,9 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.goland</depends>
+    <depends>com.intellij.modules.go</depends>
+    <depends>com.intellij.modules.go-capable</depends>
+    <depends>org.jetbrains.plugins.go</depends>
 
     <actions>
     <action id="VssIntegration.GarbageCollection" class="semicontinuity.idea.code.analyzer.golang.actions.ExportItems"
