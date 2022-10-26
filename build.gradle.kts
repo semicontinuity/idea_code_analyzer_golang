@@ -19,6 +19,12 @@ intellij {
     plugins.set(listOf("org.jetbrains.plugins.go"))
 }
 
+dependencies {
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.12.4")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.12.4")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.4")
+}
+
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
