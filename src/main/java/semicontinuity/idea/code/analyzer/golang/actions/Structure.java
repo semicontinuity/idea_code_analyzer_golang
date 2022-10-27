@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class Structure {
-    final Map<String, String> structMethods = new HashMap<>();
-    final Set<String> functions = new HashSet<>();
+    final Map<String, Set<String>> structMethods = new HashMap<>();
+    final Set<String> functionNames = new HashSet<>();
 
     final Map<QualifiedName, QualifiedName> calls = new HashMap<>();
 }

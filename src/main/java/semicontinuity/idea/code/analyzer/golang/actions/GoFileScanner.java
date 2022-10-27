@@ -1,12 +1,14 @@
 package semicontinuity.idea.code.analyzer.golang.actions;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import com.goide.psi.GoCallExpr;
 import com.goide.psi.GoCompositeLit;
 import com.goide.psi.GoFile;
 import com.goide.psi.GoFunctionDeclaration;
 import com.goide.psi.GoMethodDeclaration;
+import com.goide.psi.GoNamedSignatureOwner;
 import com.goide.psi.GoRecursiveVisitor;
 import com.goide.psi.GoReferenceExpression;
 import com.goide.psi.GoShortVarDeclaration;
@@ -18,23 +20,56 @@ import org.jetbrains.annotations.NotNull;
 
 public class GoFileScanner {
     private final GoFile goFile;
-    private final Structure scructure;
+    private final Structure structure;
     private final GoVisitor fillLinksVisitor;
 
-    public GoFileScanner(GoFile goFile, Structure scructure) {
+    public GoFileScanner(GoFile goFile, Structure structure) {
         this.goFile = goFile;
-        this.scructure = scructure;
+        this.structure = structure;
         this.fillLinksVisitor = fillLinksVisitor();
     }
 
     void scan() {
-        Collection<? extends GoTypeSpec> types = goFile.getTypes();
-        for (GoTypeSpec typeSpec : types) {
-            System.out.println("typeSpec.getText() = " + typeSpec.getText());
-        }
+        fillStructNames();
+        fillFunctionNames();
 
         visitMethods();
         visitFunctions();
+    }
+
+    private void fillStructNames() {
+        Collection<? extends GoTypeSpec> types = goFile.getTypes();
+        for (GoTypeSpec typeSpec : types) {
+            var structName = typeSpec.getIdentifier().getText();
+            var allMethods = typeSpec.getAllMethods();
+            for (GoNamedSignatureOwner method : allMethods) {
+                structure.structMethods
+                        .computeIfAbsent(structName, (k) -> new HashSet<>())
+                        .add(method.getName());
+            }
+        }
+    }
+
+    private void fillFunctionNames() {
+        Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
+        for (GoFunctionDeclaration function : functions) {
+            structure.functionNames.add(function.getName());
+        }
+    }
+
+    private void visitFunctions() {
+        Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
+        for (GoFunctionDeclaration function : functions) {
+            function.accept(fillLinksVisitor);
+        }
+    }
+
+    private void visitMethods() {
+        for (GoMethodDeclaration method : goFile.getMethods()) {
+            // receiver.getType().getText()
+            // method.getName()
+            method.accept(fillLinksVisitor);
+        }
     }
 
     @NotNull
@@ -105,20 +140,5 @@ public class GoFileScanner {
 //                System.out.println(expression.getValue());
             }
         };
-    }
-
-    private void visitFunctions() {
-        Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
-        for (GoFunctionDeclaration function : functions) {
-            function.accept(fillLinksVisitor);
-        }
-    }
-
-    private void visitMethods() {
-        for (GoMethodDeclaration method : goFile.getMethods()) {
-            // receiver.getType().getText()
-            // method.getName()
-            method.accept(fillLinksVisitor);
-        }
     }
 }
