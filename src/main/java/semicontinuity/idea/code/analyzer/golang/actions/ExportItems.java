@@ -27,20 +27,16 @@ public class ExportItems extends AnAction {
 
     private ArrayList<List<?>> toDebugGraph(Structure s) {
         var out = new ArrayList<List<?>>();
-        for (String functionName : s.functionNames) {
-            out.add(
-                    List.of(
-                            List.of("", functionName),
-                            List.of("", functionName)
-                    )
-            );
-        }
+        s.calls.forEach((from, toSet) ->
+                toSet.forEach(to -> out.add(List.of(from.toString(), to.toString())))
+        );
         return out;
     }
 
     private void writeDebugGraph(ArrayList<List<?>> o) {
         try {
-            try (var w = new FileWriter(System.getProperty("user.home") + "/tasks/analyzer/" + System.currentTimeMillis() + ".json")) {
+            try (var w = new FileWriter(System.getProperty("user.home") + "/tasks/analyzer/" + System.currentTimeMillis() +
+                    ".json")) {
                 new ObjectMapper().writeValue(w, o);
             }
         } catch (IOException e) {

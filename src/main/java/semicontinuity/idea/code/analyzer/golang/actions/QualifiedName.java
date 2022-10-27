@@ -16,4 +16,9 @@ public class QualifiedName {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return qualifier.isEmpty() ? name : qualifier + '.' + name;
+    }
 }

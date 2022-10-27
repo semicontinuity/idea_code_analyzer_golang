@@ -2,42 +2,45 @@ package semicontinuity.idea.code.analyzer.golang.actions;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.function.BiConsumer;
 
 import com.goide.psi.GoCallExpr;
 import com.goide.psi.GoCompositeLit;
 import com.goide.psi.GoFile;
 import com.goide.psi.GoFunctionDeclaration;
-import com.goide.psi.GoMethodDeclaration;
 import com.goide.psi.GoNamedSignatureOwner;
 import com.goide.psi.GoRecursiveVisitor;
 import com.goide.psi.GoReferenceExpression;
 import com.goide.psi.GoShortVarDeclaration;
 import com.goide.psi.GoTypeSpec;
 import com.goide.psi.GoVarDefinition;
-import com.goide.psi.GoVisitor;
 import com.intellij.psi.ResolveState;
 import org.jetbrains.annotations.NotNull;
 
 public class GoFileScanner {
     private final GoFile goFile;
     private final Structure structure;
-    private final GoVisitor fillLinksVisitor;
+    private final BiConsumer<QualifiedName, QualifiedName> callsFiller;
 
     public GoFileScanner(GoFile goFile, Structure structure) {
         this.goFile = goFile;
         this.structure = structure;
-        this.fillLinksVisitor = fillLinksVisitor();
+        this.callsFiller = (from, to) -> {
+            if (structure.contains(from) && structure.contains(to)) {
+                structure.calls.computeIfAbsent(from, (k) -> new HashSet<>()).add(to);
+            }
+        };
     }
 
     void scan() {
-        fillStructNames();
+        fillStructMethods();
         fillFunctionNames();
 
         visitMethods();
         visitFunctions();
     }
 
-    private void fillStructNames() {
+    private void fillStructMethods() {
         Collection<? extends GoTypeSpec> types = goFile.getTypes();
         for (GoTypeSpec typeSpec : types) {
             var structName = typeSpec.getIdentifier().getText();
@@ -58,32 +61,75 @@ public class GoFileScanner {
     }
 
     private void visitFunctions() {
-        Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
-        for (GoFunctionDeclaration function : functions) {
-            function.accept(fillLinksVisitor);
-        }
+        goFile.getFunctions().forEach(function -> {
+            System.out.println("=========================");
+            System.out.println("****** function.getQualifiedName() = " + function.getQualifiedName());
+            function.accept(fillLinksVisitor(new QualifiedName("", function.getName()), callsFiller));
+        });
     }
 
     private void visitMethods() {
-        for (GoMethodDeclaration method : goFile.getMethods()) {
-            // receiver.getType().getText()
-            // method.getName()
-            method.accept(fillLinksVisitor);
-        }
+        // receiver.getType().getText()
+        // method.getName()
+        goFile.getMethods().forEach(
+                method -> {
+                    System.out.println("==========================");
+                    System.out.println("**** method.getQualifiedName() = " + method.getQualifiedName());
+                    method.accept(
+                            fillLinksVisitor(new QualifiedName("", method.getName()), callsFiller)
+                    );
+                }
+        );
     }
 
     @NotNull
-    private static GoRecursiveVisitor fillLinksVisitor() {
+    private static GoRecursiveVisitor fillLinksVisitor(final QualifiedName from,
+                                                       final BiConsumer<QualifiedName, QualifiedName> sink) {
         return new GoRecursiveVisitor() {
             @Override
             public void visitCallExpr(@NotNull GoCallExpr callExpr) {
                 super.visitCallExpr(callExpr);
+
+                var expression = callExpr.getExpression();
+                if (expression instanceof GoReferenceExpression) {
+                    var referenceExpression = (GoReferenceExpression) expression;
+                    var firstChild = referenceExpression.getFirstChild();
+                    var firstChild1 = ((GoReferenceExpression) firstChild);
+                    var resolved = firstChild1.resolve(ResolveState.initial());
+                    if (resolved instanceof GoVarDefinition) {
+                        var varDefinition = (GoVarDefinition) resolved;
+                        var varDefinitionParent = varDefinition.getParent();
+
+                        if (varDefinitionParent instanceof GoShortVarDeclaration) {
+                            var shortVarDeclaration = (GoShortVarDeclaration) varDefinitionParent;
+                            var literal = shortVarDeclaration.getLastChild();
+                            if (literal instanceof GoCompositeLit) {
+                                var literalValue = (GoCompositeLit) literal;
+                                var structName = literalValue.getTypeReferenceExpression().getText();
+                                sink.accept(from, new QualifiedName(structName, referenceExpression.getIdentifier().getText()));
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    }
+    @NotNull
+    private static GoRecursiveVisitor fillLinksVisitor0(final QualifiedName from,
+                                                       final BiConsumer<QualifiedName, QualifiedName> sink) {
+        return new GoRecursiveVisitor() {
+            @Override
+            public void visitCallExpr(@NotNull GoCallExpr callExpr) {
+                super.visitCallExpr(callExpr);
+
+
                 System.out.println(callExpr.getText());
                 var expression = callExpr.getExpression();
                 System.out.println("expression.getText() = " + expression.getText());
                 System.out.println("expression.getValue() = " + expression.getValue());
                 if (expression instanceof GoReferenceExpression) {
                     var referenceExpression = (GoReferenceExpression) expression;
+
                     System.out.println("referenceExpression.getText() = " + referenceExpression.getText());
 
                     var qualifier = referenceExpression.getQualifier();
@@ -114,7 +160,9 @@ public class GoFileScanner {
                             var literal = shortVarDeclaration.getLastChild();
                             if (literal instanceof GoCompositeLit) {
                                 var literalValue = (GoCompositeLit) literal;
-                                System.out.println("literalValue.getTypeReferenceExpression().getText() = " + literalValue.getTypeReferenceExpression().getText());
+                                var structName = literalValue.getTypeReferenceExpression().getText();
+
+
                             }
                         }
 //                        var reference = varDefinition.getReference();
