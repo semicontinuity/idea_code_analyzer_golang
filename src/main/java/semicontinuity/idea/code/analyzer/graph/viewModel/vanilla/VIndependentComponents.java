@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import semicontinuity.idea.code.analyzer.graph.viewModel.IndependentComponents;
 
-public class VIndependentComponents implements IndependentComponents {
+public class VIndependentComponents extends VComponent implements IndependentComponents {
 
     @JsonProperty
     private final List<VComponent> components;

@@ -4,7 +4,7 @@ import java.util.List;
 
 import semicontinuity.idea.code.analyzer.graph.viewModel.Factory;
 
-public class VFactory<PAYLOAD> implements Factory<
+public class VFactory<PAYLOAD> extends VComponent implements Factory<
         PAYLOAD, VComponent, VIndependentComponents, VFanOut<PAYLOAD>, VDependentComponents<PAYLOAD>, VNode<PAYLOAD>> {
 
     @Override

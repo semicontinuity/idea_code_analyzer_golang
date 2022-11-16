@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import semicontinuity.idea.code.analyzer.graph.viewModel.DependentComponents;
 
-public class VDependentComponents<PAYLOAD> implements DependentComponents {
+public class VDependentComponents<PAYLOAD> extends VComponent implements DependentComponents {
     @JsonProperty
     private final List<VNode<PAYLOAD>> heads;
     @JsonProperty
