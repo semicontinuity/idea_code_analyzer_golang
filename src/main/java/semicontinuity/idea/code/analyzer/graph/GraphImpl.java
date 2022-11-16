@@ -2,34 +2,31 @@ package semicontinuity.idea.code.analyzer.graph;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class GraphImpl<ID, N> implements Graph<ID, N> {
+public class GraphImpl<N> implements Graph<N> {
 
-    private final HashMap<ID, N> nodes = new HashMap<>();
-    private final HashMap<ID, Set<ID>> fwdEdges = new HashMap<>();
-    private final HashMap<ID, Set<ID>> revEdges = new HashMap<>();
+    private final HashMap<N, Set<N>> fwdEdges = new HashMap<>();
+    private final HashMap<N, Set<N>> revEdges = new HashMap<>();
+
 
     @Override
-    public void addNode(ID id, N node) {
-        nodes.put(id, node);
-        fwdEdges.computeIfAbsent(id, (k) -> new HashSet<>());
-        revEdges.computeIfAbsent(id, (k) -> new HashSet<>());
+    public void addEdge(N src, N dst) {
+        fwdEdges.computeIfAbsent(src, (k) -> new HashSet<>()).add(dst);
+        revEdges.computeIfAbsent(dst, (k) -> new HashSet<>()).add(src);
+
+        fwdEdges.computeIfAbsent(dst, (k) -> new HashSet<>());
+        revEdges.computeIfAbsent(src, (k) -> new HashSet<>());
     }
 
     @Override
-    public void addEdge(ID idFrom, ID idTo) {
-        fwdEdges.get(idFrom).add(idTo);
-        revEdges.get(idTo).add(idFrom);
-    }
-
-    @Override
-    public Set<ID> findRootEdges() {
+    public List<N> findRoots() {
         return revEdges.entrySet().stream()
                 .filter(entry -> entry.getValue().size() == 0)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 }

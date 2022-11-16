@@ -1,12 +1,10 @@
 package semicontinuity.idea.code.analyzer.graph;
 
-import java.util.Set;
+import java.util.List;
 
-public interface Graph<ID, N> {
+public interface Graph<N> {
 
-    void addNode(ID id, N node);
+    void addEdge(N src, N dst);
 
-    void addEdge(ID idFrom, ID idTo);
-
-    Set<ID> findRootEdges();
+    List<N> findRoots();
 }
