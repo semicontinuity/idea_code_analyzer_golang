@@ -9,17 +9,38 @@ import java.util.stream.Collectors;
 
 public class DAGraphImpl<N> implements DAGraph<N> {
 
+    boolean hasEdges;
+
+    private final HashSet<N> nodes = new HashSet<>();
+
     private final HashMap<N, Set<N>> fwdEdges = new HashMap<>();
     private final HashMap<N, Set<N>> revEdges = new HashMap<>();
 
 
     @Override
     public void addEdge(N src, N dst) {
+        addNode(src);
+        addNode(dst);
         fwdEdges.computeIfAbsent(src, (k) -> new HashSet<>()).add(dst);
         revEdges.computeIfAbsent(dst, (k) -> new HashSet<>()).add(src);
+        hasEdges = true;
+    }
 
-        fwdEdges.computeIfAbsent(dst, (k) -> new HashSet<>());
-        revEdges.computeIfAbsent(src, (k) -> new HashSet<>());
+    @Override
+    public Set<N> nodes() {
+        return nodes;
+    }
+
+    @Override
+    public boolean hasEdges() {
+        return hasEdges;
+    }
+
+    @Override
+    public void addNode(N n) {
+        fwdEdges.computeIfAbsent(n, (k) -> new HashSet<>());
+        revEdges.computeIfAbsent(n, (k) -> new HashSet<>());
+        nodes.add(n);
     }
 
     @Override
@@ -31,9 +52,12 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     }
 
     @Override
-    public Map<Set<N>, DAGraph<N>> rootsWithSubgraph() {
-        var roots = findRoots();
+    public Map<Set<N>, DAGraph<N>> decompose() {
+        return decomposeFrom(findRoots());
+    }
 
+    @Override
+    public Map<Set<N>, DAGraph<N>> decomposeFrom(List<N> roots) {
         // Paint every node with the 'color' of its root.
         var colors = new HashMap<N, N>();
         for (N root : roots) {
@@ -61,7 +85,9 @@ public class DAGraphImpl<N> implements DAGraph<N> {
         for (Set<N> rootGroup : rootGroups.values()) {
             var subGraph = new DAGraphImpl<N>();
             for (N root : rootGroup) {
-                fillSubGraphFrom(root, subGraph);
+                for (N nextNode : fwdEdges.get(root)) {
+                    fillSubGraphFrom(nextNode, subGraph);
+                }
             }
             result.put(rootGroup, subGraph);
         }
@@ -87,6 +113,7 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     }
 
     void fillSubGraphFrom(N node, DAGraphImpl<N> sink) {
+        sink.addNode(node);
         for (N nextNode : fwdEdges.get(node)) {
             sink.addEdge(node, nextNode);
             fillSubGraphFrom(nextNode, sink);

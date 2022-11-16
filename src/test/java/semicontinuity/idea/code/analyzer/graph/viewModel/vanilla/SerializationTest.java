@@ -43,9 +43,11 @@ public class SerializationTest {
                         ),
                         new VFanOut<>(
                                 new VNode<>("r2"),
-                                List.of(
-                                        new VNode<>("n20"),
-                                        new VNode<>("n21")
+                                new VIndependentComponents(
+                                        List.of(
+                                                new VNode<>("n20"),
+                                                new VNode<>("n21")
+                                        )
                                 )
                         )
                 )

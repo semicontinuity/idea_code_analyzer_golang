@@ -8,12 +8,12 @@ public class VFactory<PAYLOAD> extends VComponent implements Factory<
         PAYLOAD, VComponent, VIndependentComponents, VFanOut<PAYLOAD>, VDependentComponents<PAYLOAD>, VNode<PAYLOAD>> {
 
     @Override
-    public VIndependentComponents newIndependentComponents(List<VComponent> components) {
+    public VIndependentComponents newIndependentComponents(List<? extends VComponent> components) {
         return new VIndependentComponents(components);
     }
 
     @Override
-    public VFanOut<PAYLOAD> newFanout(VNode<PAYLOAD> head, List<VComponent> followers) {
+    public VFanOut<PAYLOAD> newFanout(VNode<PAYLOAD> head, VComponent followers) {
         return new VFanOut<>(head, followers);
     }
 

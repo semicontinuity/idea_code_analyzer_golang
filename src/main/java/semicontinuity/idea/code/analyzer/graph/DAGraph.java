@@ -11,9 +11,17 @@ import java.util.Set;
  */
 public interface DAGraph<N> {
 
+    Set<N> nodes();
+
+    boolean hasEdges();
+
+    void addNode(N src);
+
     void addEdge(N src, N dst);
 
     List<N> findRoots();
 
-    Map<Set<N>, DAGraph<N>> rootsWithSubgraph();
+    Map<Set<N>, DAGraph<N>> decompose();
+
+    Map<Set<N>, DAGraph<N>> decomposeFrom(List<N> roots);
 }

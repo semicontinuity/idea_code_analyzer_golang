@@ -4,16 +4,16 @@ import java.util.List;
 
 public interface Factory<
         NODE_PAYLOAD,
-        COMP extends Component,
-        IND_COMPS extends IndependentComponents,
-        FANOUT extends FanOut,
-        DEP_COMPS extends DependentComponents,
-        NODE extends Node
+        COMP,
+        IND_COMPS extends COMP,
+        FANOUT extends COMP,
+        DEP_COMPS extends COMP,
+        NODE extends COMP
         > {
 
-    IND_COMPS newIndependentComponents(List<COMP> components);
+    IND_COMPS newIndependentComponents(List<? extends COMP> components);
 
-    FANOUT newFanout(NODE head, List<COMP> followers);
+    FANOUT newFanout(NODE head, COMP deeperLayers);
 
     DEP_COMPS newDependentComponents(List<NODE> heads, COMP deeperLayers);
 
