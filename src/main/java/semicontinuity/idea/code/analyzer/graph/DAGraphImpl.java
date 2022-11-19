@@ -131,7 +131,7 @@ public class DAGraphImpl<N> implements DAGraph<N> {
         }
     }
 
-    void fillSubGraphFrom(N node, DAGraphImpl<N> sink) {
+    void fillSubGraphFrom(N node, DAGraph<N> sink) {
         sink.addNode(node);
         for (N nextNode : fwdEdges.get(node)) {
             sink.addEdge(node, nextNode);
