@@ -15,6 +15,8 @@ public interface DAGraph<N> {
 
     boolean hasEdges();
 
+    boolean hasNodes();
+
     void addNode(N src);
 
     void addEdge(N src, N dst);

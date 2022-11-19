@@ -1,5 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -27,12 +28,20 @@ public class DAGraphViewRenderer<N,
 
 
     public COMP render(DAGraph<N> graph) {
+        var view = doRender(graph);
+        if (view == null) return viewFactory.newIndependentComponents(List.of());
+        return view;
+    }
+
+    private COMP doRender(DAGraph<N> graph) {
+        if (!graph.hasNodes()) return null;
+
         if (!graph.hasEdges()) {
             var nodeViews = graph.nodes()
                     .stream()
                     .map(node -> viewFactory.newNode(payloadFunction.apply(node)))
                     .collect(Collectors.toList());
-            return viewFactory.newIndependentComponents(nodeViews);
+            return newIndependentComponents(nodeViews);
         }
 
         var decompose = graph.decompose();
@@ -41,27 +50,32 @@ public class DAGraphViewRenderer<N,
                 .map(this::renderIndependentComponent)
                 .collect(Collectors.toList());
 
-        if (components.size() == 1) {
-            return components.get(0);
-        } else {
-            return viewFactory.newIndependentComponents(components);
-        }
+        return newIndependentComponents(components);
     }
 
 
     COMP renderIndependentComponent(Map.Entry<Set<N>, DAGraph<N>> rootsWithSubgraph) {
         var roots = rootsWithSubgraph.getKey();
         var subGraph = rootsWithSubgraph.getValue();
-        var subGraphView = render(subGraph);
+        var subGraphView = doRender(subGraph);
 
         var rootsViews = roots.stream()
                 .map(r -> viewFactory.newNode(payloadFunction.apply(r)))
                 .collect(Collectors.toList());
+        if (subGraphView == null) return newIndependentComponents(rootsViews);
 
         if (rootsViews.size() == 1) {
             return viewFactory.newFanout(rootsViews.get(0), subGraphView);
         } else {
             return viewFactory.newDependentComponents(rootsViews, subGraphView);
+        }
+    }
+
+    private COMP newIndependentComponents(List<? extends COMP> components) {
+        if (components.size() == 1) {
+            return components.get(0);
+        } else {
+            return viewFactory.newIndependentComponents(components);
         }
     }
 }

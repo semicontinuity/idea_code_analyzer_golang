@@ -27,13 +27,18 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     }
 
     @Override
+    public boolean hasEdges() {
+        return hasEdges;
+    }
+
+    @Override
     public Set<N> nodes() {
         return nodes;
     }
 
     @Override
-    public boolean hasEdges() {
-        return hasEdges;
+    public boolean hasNodes() {
+        return !nodes.isEmpty();
     }
 
     @Override

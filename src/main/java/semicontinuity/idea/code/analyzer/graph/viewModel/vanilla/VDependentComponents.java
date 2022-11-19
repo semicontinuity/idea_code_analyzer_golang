@@ -2,16 +2,18 @@ package semicontinuity.idea.code.analyzer.graph.viewModel.vanilla;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class VDependentComponents<PAYLOAD> extends VComponent {
     @JsonProperty
-    private final List<VNode<PAYLOAD>> heads;
+    private final List<VNode<PAYLOAD>> front;
     @JsonProperty
-    private final VComponent deeperLayers;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private final VComponent back;
 
-    public VDependentComponents(List<VNode<PAYLOAD>> heads, VComponent deeperLayers) {
-        this.heads = heads;
-        this.deeperLayers = deeperLayers;
+    public VDependentComponents(List<VNode<PAYLOAD>> front, VComponent back) {
+        this.front = front;
+        this.back = back;
     }
 }
