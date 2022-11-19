@@ -43,12 +43,26 @@ public class DAGraphImpl<N> implements DAGraph<N> {
         nodes.add(n);
     }
 
-    @Override
-    public List<N> findRoots() {
-        return revEdges.entrySet().stream()
-                .filter(entry -> entry.getValue().size() == 0)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+    public Map<N, Integer> layout() {
+        return layoutFrom(findRoots());
+    }
+
+    public Map<N, Integer> layoutFrom(List<N> roots) {
+        var depths = new HashMap<N, Integer>();
+        for (N root : roots) {
+            setDepth(0, root, depths);
+        }
+        return depths;
+    }
+
+    private void setDepth(int depth, N node, Map<N, Integer> depths) {
+        var currentDepth = depths.get(node);
+        if (currentDepth == null || currentDepth < depth) {
+            depths.put(node, depth);
+            for (N n : fwdEdges.get(node)) {
+                setDepth(depth + 1, n, depths);
+            }
+        }
     }
 
     @Override
@@ -118,6 +132,14 @@ public class DAGraphImpl<N> implements DAGraph<N> {
             sink.addEdge(node, nextNode);
             fillSubGraphFrom(nextNode, sink);
         }
+    }
+
+    @Override
+    public List<N> findRoots() {
+        return revEdges.entrySet().stream()
+                .filter(entry -> entry.getValue().size() == 0)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     @Override

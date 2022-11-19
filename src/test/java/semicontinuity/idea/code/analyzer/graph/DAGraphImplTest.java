@@ -24,4 +24,9 @@ class DAGraphImplTest implements DAGraphImplTestData {
                 exampleGraph1().decompose()
         );
     }
+
+    @Test
+    void layout() {
+        Assertions.assertEquals(exampleGraph2Depths(), exampleGraph2().layout());
+    }
 }
