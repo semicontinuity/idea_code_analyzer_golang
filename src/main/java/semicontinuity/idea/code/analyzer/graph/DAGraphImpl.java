@@ -63,6 +63,12 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     }
 
     @Override
+    public int incomingEdgeCount(N node) {
+        var edges = revEdges.get(node);
+        return edges == null ? 0 : edges.size();
+    }
+
+    @Override
     public String toString() {
         return fwdEdges.toString();
     }

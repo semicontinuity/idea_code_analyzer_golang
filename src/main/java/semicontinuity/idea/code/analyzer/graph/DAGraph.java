@@ -23,4 +23,6 @@ public interface DAGraph<N> {
     List<N> findRoots();
 
     Set<N> followers(N node);
+
+    int incomingEdgeCount(N node);
 }
