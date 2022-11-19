@@ -48,27 +48,6 @@ public class DAGraphImpl<N> implements DAGraph<N> {
         nodes.add(n);
     }
 
-    public Map<N, Integer> layout() {
-        return layoutFrom(findRoots());
-    }
-
-    public Map<N, Integer> layoutFrom(List<N> roots) {
-        var depths = new HashMap<N, Integer>();
-        for (N root : roots) {
-            setDepth(0, root, depths);
-        }
-        return depths;
-    }
-
-    private void setDepth(int depth, N node, Map<N, Integer> depths) {
-        var currentDepth = depths.get(node);
-        if (currentDepth == null || currentDepth < depth) {
-            depths.put(node, depth);
-            for (N n : followers(node)) {
-                setDepth(depth + 1, n, depths);
-            }
-        }
-    }
 
     @Override
     public List<N> findRoots() {

@@ -1,7 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
@@ -14,8 +13,4 @@ class DAGraphImplTest implements DAGraphImplTestData1, DAGraphImplTestData2, DAG
         Assertions.assertEquals(Set.of("r0", "r1", "r2"), new HashSet<>(exampleGraph1().findRoots()));
     }
 
-    @Test
-    void layout() {
-        Assertions.assertEquals(exampleGraph2Depths(), exampleGraph2().layout());
-    }
 }
