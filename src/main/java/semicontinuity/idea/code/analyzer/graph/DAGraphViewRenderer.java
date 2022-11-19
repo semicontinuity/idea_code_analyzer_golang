@@ -44,7 +44,7 @@ public class DAGraphViewRenderer<N,
             return newIndependentComponents(nodeViews);
         }
 
-        var decompose = graph.decompose();
+        var decompose = new DAGraphDecomposer<>(graph).decompose();
         var components = decompose.entrySet()
                 .stream()
                 .map(this::renderIndependentComponent)

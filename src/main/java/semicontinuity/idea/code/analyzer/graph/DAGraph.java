@@ -1,7 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,7 +22,5 @@ public interface DAGraph<N> {
 
     List<N> findRoots();
 
-    Map<Set<N>, DAGraph<N>> decompose();
-
-    Map<Set<N>, DAGraph<N>> decomposeFrom(List<N> roots);
+    Set<N> followers(N node);
 }
