@@ -14,13 +14,15 @@ public class DAGraphViewRenderer<N,
         IND_COMPS extends COMP,
         FANOUT extends COMP,
         DEP_COMPS extends COMP,
-        NODE extends COMP> {
+        NODE extends COMP,
+        SPLIT extends COMP,
+        LAYER extends COMP> {
 
-    private final Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE> viewFactory;
+    private final Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE, SPLIT, LAYER> viewFactory;
     private final Function<N, NODE_PAYLOAD> payloadFunction;
 
     public DAGraphViewRenderer(
-            Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE> viewFactory,
+            Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE, SPLIT, LAYER> viewFactory,
             Function<N, NODE_PAYLOAD> payloadFunction) {
         this.viewFactory = viewFactory;
         this.payloadFunction = payloadFunction;

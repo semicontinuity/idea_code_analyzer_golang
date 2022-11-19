@@ -14,16 +14,18 @@ public class DAGraphViewRenderer2<N,
         IND_COMPS extends COMP,
         FANOUT extends COMP,
         DEP_COMPS extends COMP,
-        NODE extends COMP> {
+        NODE extends COMP,
+        SPLIT extends COMP,
+        LAYER extends COMP> {
 
     private final DAGraph<N> graph;
-    private final Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE> viewFactory;
+    private final Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE, SPLIT, LAYER> viewFactory;
     private final Function<N, NODE_PAYLOAD> payloadFunction;
     private final Set<N> multiNodes;
 
     public DAGraphViewRenderer2(
             DAGraph<N> graph,
-            Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE> viewFactory,
+            Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE, SPLIT, LAYER> viewFactory,
             Function<N, NODE_PAYLOAD> payloadFunction) {
         this.graph = graph;
         this.viewFactory = viewFactory;
@@ -42,45 +44,50 @@ public class DAGraphViewRenderer2<N,
         if (!graph.hasNodes()) return null;
 
         if (!graph.hasEdges()) {
-            var nodeViews = graph.nodes()
-                    .stream()
-                    .map(node -> viewFactory.newNode(payloadFunction.apply(node)))
-                    .collect(Collectors.toList());
-            return newIndependentComponents(nodeViews);
+            var direct = nodeViews(graph, false);
+            var shared = nodeViews(graph, true);
+            return viewFactory.newLayer(independentCompsIfManyOrNullIfZero(direct), independentCompsIfManyOrNullIfZero(shared));
         }
 
         var decompose = new DAGraphDecomposer<>(graph).decompose();
         var components = decompose.entrySet()
                 .stream()
-                .map(this::renderIndependentComponent)
+                .map(this::renderRootsWithSubgraph)
                 .collect(Collectors.toList());
 
-        return newIndependentComponents(components);
+        return independentCompsIfManyOrNullIfZero(components);
     }
 
-
-    COMP renderIndependentComponent(Map.Entry<Set<N>, DAGraph<N>> rootsWithSubgraph) {
+    COMP renderRootsWithSubgraph(Map.Entry<Set<N>, DAGraph<N>> rootsWithSubgraph) {
         var roots = rootsWithSubgraph.getKey();
         var subGraph = rootsWithSubgraph.getValue();
-        var subGraphView = doRender(subGraph);
 
         var rootsViews = roots.stream()
                 .map(r -> viewFactory.newNode(payloadFunction.apply(r)))
                 .collect(Collectors.toList());
-        if (subGraphView == null) return newIndependentComponents(rootsViews);
 
-        if (rootsViews.size() == 1) {
-            return viewFactory.newFanout(rootsViews.get(0), subGraphView);
+        var subGraphView = doRender(subGraph);
+        if (subGraphView == null) return independentCompsIfManyOrNullIfZero(rootsViews);
+
+        return viewFactory.newSplit(rootsViews, subGraphView);
+    }
+
+    private COMP independentCompsIfManyOrNullIfZero(List<? extends COMP> items) {
+        if (items.size() == 0) {
+            return null;
+        } else if (items.size() == 1) {
+            return items.get(0);
         } else {
-            return viewFactory.newDependentComponents(rootsViews, subGraphView);
+            return viewFactory.newIndependentComponents(items);
         }
     }
 
-    private COMP newIndependentComponents(List<? extends COMP> components) {
-        if (components.size() == 1) {
-            return components.get(0);
-        } else {
-            return viewFactory.newIndependentComponents(components);
-        }
+
+    private List<NODE> nodeViews(DAGraph<N> graph, boolean isMultiNode) {
+        return graph.nodes()
+                .stream()
+                .filter(n -> multiNodes.contains(n) == isMultiNode)
+                .map(node -> viewFactory.newNode(payloadFunction.apply(node)))
+                .collect(Collectors.toList());
     }
 }

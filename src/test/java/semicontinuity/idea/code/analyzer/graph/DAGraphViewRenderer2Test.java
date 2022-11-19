@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VFactory;
 
-class DAGraphViewRenderer2Test implements DAGraphImplTestData1, DAGraphImplTestData3 {
+class DAGraphViewRenderer2Test implements DAGraphImplTestData1, DAGraphImplTestData3, DAGraphImplTestData4 {
 
     @Test
     void render1() throws JsonProcessingException {
@@ -15,6 +15,11 @@ class DAGraphViewRenderer2Test implements DAGraphImplTestData1, DAGraphImplTestD
     @Test
     void render3() throws JsonProcessingException {
         render(exampleGraph3());
+    }
+
+    @Test
+    void render4() throws JsonProcessingException {
+        render(exampleGraph4());
     }
 
     private void render(DAGraph<String> graph) throws JsonProcessingException {

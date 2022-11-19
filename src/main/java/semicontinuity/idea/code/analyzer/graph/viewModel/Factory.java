@@ -8,7 +8,9 @@ public interface Factory<
         IND_COMPS extends COMP,
         FANOUT extends COMP,
         DEP_COMPS extends COMP,
-        NODE extends COMP
+        NODE extends COMP,
+        SPLIT extends COMP,
+        LAYER extends COMP
         > {
 
     IND_COMPS newIndependentComponents(List<? extends COMP> components);
@@ -18,4 +20,8 @@ public interface Factory<
     DEP_COMPS newDependentComponents(List<NODE> heads, COMP deeperLayers);
 
     NODE newNode(NODE_PAYLOAD payload);
+
+    SPLIT newSplit(List<NODE> items, COMP subLayer);
+
+    LAYER newLayer(COMP directDeps, COMP sharedDeps);
 }
