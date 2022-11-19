@@ -19,6 +19,14 @@ public interface DAGraphImplTestData2 {
         return g;
     }
 
+    default DAGraph<String> exampleGraph2SubgraphR0R1() {
+        DAGraph<String> g = new DAGraphImpl<>();
+        g.addEdge("m1", "d1");
+        g.addEdge("d1", "f1");
+        g.addEdge("d1", "f2");
+        return g;
+    }
+
     default Map<String, Integer> exampleGraph2Depths() {
 
         // r0 --> m1 -     --> f1
