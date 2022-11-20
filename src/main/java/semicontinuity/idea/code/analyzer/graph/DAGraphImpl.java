@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DAGraphImpl<N> implements DAGraph<N> {
@@ -16,6 +18,33 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     private final HashMap<N, Set<N>> fwdEdges = new HashMap<>();
     private final HashMap<N, Set<N>> revEdges = new HashMap<>();
 
+
+    @Override
+    public void addNode(N n) {
+        fwdEdges.computeIfAbsent(n, (k) -> new HashSet<>());
+        revEdges.computeIfAbsent(n, (k) -> new HashSet<>());
+        nodes.add(n);
+    }
+
+    @Override
+    public boolean hasNodes() {
+        return !nodes.isEmpty();
+    }
+
+    @Override
+    public Set<N> nodes() {
+        return nodes;
+    }
+
+    @Override
+    public boolean containsNode(N node) {
+        return nodes.contains(node);
+    }
+
+    @Override
+    public void forEachNode(Consumer<N> consumer) {
+        nodes.forEach(consumer);
+    }
 
     @Override
     public void addEdge(N src, N dst) {
@@ -32,20 +61,18 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     }
 
     @Override
-    public Set<N> nodes() {
-        return nodes;
+    public int incomingEdgeCount(N node) {
+        var edges = revEdges.get(node);
+        return edges == null ? 0 : edges.size();
     }
 
     @Override
-    public boolean hasNodes() {
-        return !nodes.isEmpty();
-    }
-
-    @Override
-    public void addNode(N n) {
-        fwdEdges.computeIfAbsent(n, (k) -> new HashSet<>());
-        revEdges.computeIfAbsent(n, (k) -> new HashSet<>());
-        nodes.add(n);
+    public void forEachEdge(BiConsumer<N, N> consumer) {
+        for (Map.Entry<N, Set<N>> e : fwdEdges.entrySet()) {
+            for (N n : e.getValue()) {
+                consumer.accept(e.getKey(), n);
+            }
+        }
     }
 
 
@@ -62,11 +89,6 @@ public class DAGraphImpl<N> implements DAGraph<N> {
         return fwdEdges.get(node);
     }
 
-    @Override
-    public int incomingEdgeCount(N node) {
-        var edges = revEdges.get(node);
-        return edges == null ? 0 : edges.size();
-    }
 
     @Override
     public String toString() {

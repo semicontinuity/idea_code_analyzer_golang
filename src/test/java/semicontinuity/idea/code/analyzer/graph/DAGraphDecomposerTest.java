@@ -12,8 +12,8 @@ class DAGraphDecomposerTest implements DAGraphImplTestData1, DAGraphImplTestData
     void decompose_1() {
         Assertions.assertEquals(
                 Map.of(
-                        Set.of("r0", "r1"), exampleGraph1SubgraphR0R1(),
-                        Set.of("r2"), exampleGraph1SubgraphR2()
+                        Set.of("r0", "r1"), exampleGraph1SubgraphR0R1Back(),
+                        Set.of("r2"), exampleGraph1SubgraphR2Back()
                 ),
                 new DAGraphDecomposer<>(exampleGraph1()).decompose()
         );

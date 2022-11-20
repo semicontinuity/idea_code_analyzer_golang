@@ -2,6 +2,8 @@ package semicontinuity.idea.code.analyzer.graph;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Direct acyclic graph abstraction.
@@ -10,19 +12,27 @@ import java.util.Set;
  */
 public interface DAGraph<N> {
 
-    Set<N> nodes();
-
-    boolean hasEdges();
+    void addNode(N src);
 
     boolean hasNodes();
 
-    void addNode(N src);
+    Set<N> nodes();
+
+    boolean containsNode(N node);
+
+    void forEachNode(Consumer<N> consumer);
+
 
     void addEdge(N src, N dst);
+
+    boolean hasEdges();
+
+    int incomingEdgeCount(N node);
+
+    void forEachEdge(BiConsumer<N, N> consumer);
+
 
     List<N> findRoots();
 
     Set<N> followers(N node);
-
-    int incomingEdgeCount(N node);
 }
