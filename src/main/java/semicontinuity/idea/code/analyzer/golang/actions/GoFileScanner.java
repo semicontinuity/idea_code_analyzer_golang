@@ -1,7 +1,6 @@
 package semicontinuity.idea.code.analyzer.golang.actions;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.function.BiConsumer;
 
 import com.goide.psi.GoCallExpr;
@@ -47,10 +46,7 @@ public class GoFileScanner {
             var structName = typeSpec.getIdentifier().getText();
             var allMethods = typeSpec.getAllMethods();
             for (GoNamedSignatureOwner method : allMethods) {
-                System.out.println("Adding method = " + structName + "." + method.getName());
-                structure.structMethods
-                        .computeIfAbsent(structName, (k) -> new HashSet<>())
-                        .add(method.getName());
+                structure.addMethod(structName, method.getName());
             }
         }
     }
@@ -59,7 +55,7 @@ public class GoFileScanner {
         Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
         for (GoFunctionDeclaration function : functions) {
             System.out.println("Adding function = " + function.getName());
-            structure.functionNames.add(function.getName());
+            structure.addFunction(function.getName());
         }
     }
 

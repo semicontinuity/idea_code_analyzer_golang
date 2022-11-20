@@ -6,10 +6,21 @@ import java.util.Map;
 import java.util.Set;
 
 public class Structure {
-    final Map<String, Set<String>> structMethods = new HashMap<>();
-    final Set<String> functionNames = new HashSet<>();
+    private final Map<String, Set<String>> structMethods = new HashMap<>();
+    private final Set<String> functionNames = new HashSet<>();
 
     final Map<QualifiedName, Set<QualifiedName>> calls = new HashMap<>();
+
+    void addFunction(String name) {
+        functionNames.add(name);
+    }
+
+    void addMethod(String structName, String name) {
+        System.out.println("Adding method = " + structName + "." + name);
+        structMethods
+                .computeIfAbsent(structName, (k) -> new HashSet<>())
+                .add(name);
+    }
 
     public void addCall(QualifiedName from, QualifiedName to) {
         if (contains(from) && contains(to)) {
