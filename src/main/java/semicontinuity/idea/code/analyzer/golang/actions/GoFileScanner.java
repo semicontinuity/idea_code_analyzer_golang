@@ -28,14 +28,7 @@ public class GoFileScanner {
     public GoFileScanner(GoFile goFile, Structure structure) {
         this.goFile = goFile;
         this.structure = structure;
-        this.callsFiller = (from, to) -> {
-            if (structure.contains(from) && structure.contains(to)) {
-                System.out.println("Adding call " + from + "->" + to);
-                structure.calls.computeIfAbsent(from, (k) -> new HashSet<>()).add(to);
-            } else {
-                System.out.println("Out of scope: " + from + " or " + to);
-            }
-        };
+        this.callsFiller = structure::addCall;
     }
 
     void registerEntities() {
