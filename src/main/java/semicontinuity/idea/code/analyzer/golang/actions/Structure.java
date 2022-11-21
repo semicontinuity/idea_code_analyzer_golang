@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class Structure {
     private final Map<String, Set<String>> structMethods = new HashMap<>();
@@ -12,7 +13,11 @@ public class Structure {
     final Map<QualifiedName, Set<QualifiedName>> calls = new HashMap<>();
 
     void addFunction(String name) {
-        functionNames.add(name);
+        System.out.println("Adding function = " + name);
+//        functionNames.add(name);
+        structMethods
+                .computeIfAbsent("", (k) -> new HashSet<>())
+                .add(name);
     }
 
     void addMethod(String structName, String name) {
@@ -29,6 +34,10 @@ public class Structure {
         } else {
             System.out.println("Out of scope: " + from + " or " + to);
         }
+    }
+
+    public void forEachCall(BiConsumer<QualifiedName, QualifiedName> c) {
+        calls.forEach((from, toSet) -> toSet.forEach(to -> c.accept(from, to)));
     }
 
     boolean contains(QualifiedName qName) {

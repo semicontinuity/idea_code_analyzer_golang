@@ -54,7 +54,6 @@ public class GoFileScanner {
     private void fillFunctionNames() {
         Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
         for (GoFunctionDeclaration function : functions) {
-            System.out.println("Adding function = " + function.getName());
             structure.addFunction(function.getName());
         }
     }

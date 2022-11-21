@@ -46,9 +46,7 @@ public class ExportItems extends AnAction {
 
     private ArrayList<List<?>> toDebugGraph(Structure s) {
         var out = new ArrayList<List<?>>();
-        s.calls.forEach((from, toSet) ->
-                toSet.forEach(to -> out.add(List.of(from.toString(), to.toString())))
-        );
+        s.forEachCall((from, to) -> out.add(List.of(from.toString(), to.toString())));
         return out;
     }
 
