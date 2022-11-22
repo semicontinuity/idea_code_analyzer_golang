@@ -12,20 +12,18 @@ public class DAGraphViewRenderer<N,
         NODE_PAYLOAD,
         COMP,
         IND_COMPS extends COMP,
-        FANOUT extends COMP,
-        DEP_COMPS extends COMP,
         NODE extends COMP,
         SPLIT extends COMP,
         LAYER extends COMP> {
 
     private final DAGraph<N> graph;
-    private final Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE, SPLIT, LAYER> viewFactory;
+    private final Factory<NODE_PAYLOAD, COMP, IND_COMPS, NODE, SPLIT, LAYER> viewFactory;
     private final Function<N, NODE_PAYLOAD> payloadFunction;
     private final Set<N> multiNodes;
 
     public DAGraphViewRenderer(
             DAGraph<N> graph,
-            Factory<NODE_PAYLOAD, COMP, IND_COMPS, FANOUT, DEP_COMPS, NODE, SPLIT, LAYER> viewFactory,
+            Factory<NODE_PAYLOAD, COMP, IND_COMPS, NODE, SPLIT, LAYER> viewFactory,
             Function<N, NODE_PAYLOAD> payloadFunction) {
         this.graph = graph;
         this.viewFactory = viewFactory;

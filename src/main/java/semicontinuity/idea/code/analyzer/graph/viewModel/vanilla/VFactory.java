@@ -8,8 +8,6 @@ public class VFactory<PAYLOAD> extends VComponent implements Factory<
         PAYLOAD,
         VComponent,
         VIndependentComponents,
-        VFanOut<PAYLOAD>,
-        VDependentComponents<PAYLOAD>,
         VNode<PAYLOAD>,
         VSplit<PAYLOAD>,
         VLayer
@@ -18,16 +16,6 @@ public class VFactory<PAYLOAD> extends VComponent implements Factory<
     @Override
     public VIndependentComponents newIndependentComponents(List<? extends VComponent> components) {
         return new VIndependentComponents(components);
-    }
-
-    @Override
-    public VFanOut<PAYLOAD> newFanout(VNode<PAYLOAD> head, VComponent followers) {
-        return new VFanOut<>(head, followers);
-    }
-
-    @Override
-    public VDependentComponents<PAYLOAD> newDependentComponents(List<VNode<PAYLOAD>> heads, VComponent deeperLayers) {
-        return new VDependentComponents<>(heads, deeperLayers);
     }
 
     @Override

@@ -14,42 +14,10 @@ public class SerializationTest {
     }
 
     private Object exampleViewModel1() {
-        //
-        //    _ n0
-        //   /
-        // r0
-        //   \_ nX
-        //   /
-        // r1
-        //   \_ n1
-        //
-        // r2-->n20
-        //    \_n21
-
         return new VIndependentComponents(
                 List.of(
-                        new VDependentComponents<>(
-                                List.of(
-                                        new VNode<>("r0"),
-                                        new VNode<>("r1")
-                                ),
-                                new VIndependentComponents(
-                                        List.of(
-                                                new VNode<>("n0"),
-                                                new VNode<>("nX"),
-                                                new VNode<>("n1")
-                                        )
-                                )
-                        ),
-                        new VFanOut<>(
-                                new VNode<>("r2"),
-                                new VIndependentComponents(
-                                        List.of(
-                                                new VNode<>("n20"),
-                                                new VNode<>("n21")
-                                        )
-                                )
-                        )
+                        new VNode<>("n20"),
+                        new VNode<>("n21")
                 )
         );
     }
