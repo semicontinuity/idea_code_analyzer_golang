@@ -8,11 +8,12 @@ import javax.swing.WindowConstants;
 
 public class JFrameExample {
     public static void main(String[] args) {
+        frame(vbox());
+    }
+
+    private static void frame(JComponent contents) {
         var f = new JFrame("test");
-
-        f.setContentPane(vbox());
-
-//        f.setSize(200, 300);
+        f.setContentPane(contents);
         f.pack();
         f.setLocationRelativeTo(null);
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
