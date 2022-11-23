@@ -177,17 +177,18 @@ public class ToolWindow implements ProjectComponent {
     private JComponent structsView(Map<String, DAGraph<String>> structGraphs) {
         var verticalBox = Box.createVerticalBox();
         structGraphs.forEach((struct, structGraph) -> {
-            JPanel structView = structsView(struct, structGraph);
+            JPanel structView = structView(struct, structGraph);
             verticalBox.add(structView);
         });
         return verticalBox;
     }
 
     @NotNull
-    private static JPanel structsView(String struct, DAGraph<String> structGraph) {
+    private static JPanel structView(String struct, DAGraph<String> structGraph) {
         var structView = new JPanel();
+        structView.setLayout(new BorderLayout());
         structView.setBorder(BorderFactory.createTitledBorder(struct));
-        structView.add(render(structGraph));
+        structView.add(render(structGraph), BorderLayout.WEST);
         return structView;
     }
 
