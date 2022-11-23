@@ -1,11 +1,15 @@
 package semicontinuity.idea.code.analyzer.golang.toolwindow;
 
 import java.awt.BorderLayout;
+import java.util.Map;
 import java.util.Objects;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -22,6 +26,10 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import semicontinuity.idea.code.analyzer.golang.StructureSplitter;
+import semicontinuity.idea.code.analyzer.graph.DAGraph;
+import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
 
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
 
@@ -160,9 +168,25 @@ public class ToolWindow implements ProjectComponent {
 
         myContentPanel.removeAll();
         var structure = fillStructure(goFile);
-        for (String structName : structure.structNames()) {
-            myContentPanel.add(new JButton(structName));
-        }
+        var structGraphs = StructureSplitter.split(structure, DAGraphImpl::new);
+        myContentPanel.add(structsView(structGraphs));
+    }
+
+    private JComponent structsView(Map<String, DAGraph<String>> structGraphs) {
+        var verticalBox = Box.createVerticalBox();
+        structGraphs.forEach((struct, structGraph) -> {
+            JPanel structView = structsView(struct);
+            verticalBox.add(structView);
+        });
+        return verticalBox;
+    }
+
+    @NotNull
+    private static JPanel structsView(String struct) {
+        var structView = new JPanel();
+        structView.setBorder(BorderFactory.createTitledBorder(struct));
+        structView.add(new JButton("TODO"));
+        return structView;
     }
 
     private void unregisterToolWindow() {
