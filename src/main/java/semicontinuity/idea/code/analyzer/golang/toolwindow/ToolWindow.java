@@ -22,7 +22,8 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
-import semicontinuity.idea.code.analyzer.golang.actions.GoFileScanner;
+
+import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
 
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ToolWindow implements ProjectComponent {
@@ -158,9 +159,11 @@ public class ToolWindow implements ProjectComponent {
         lastGoFile = goFile;
 
         myContentPanel.removeAll();
-        myContentPanel.add(new JButton(goFile.getName()));
+        var structure = fillStructure(goFile);
+        for (String structName : structure.structNames()) {
+            myContentPanel.add(new JButton(structName));
+        }
     }
-
 
     private void unregisterToolWindow() {
         final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(myProject);

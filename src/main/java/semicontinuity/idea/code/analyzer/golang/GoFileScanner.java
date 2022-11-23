@@ -1,7 +1,8 @@
-package semicontinuity.idea.code.analyzer.golang.actions;
+package semicontinuity.idea.code.analyzer.golang;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.goide.psi.GoCallExpr;
 import com.goide.psi.GoCompositeLit;
@@ -21,21 +22,22 @@ import org.jetbrains.annotations.NotNull;
 
 public class GoFileScanner {
     private final GoFile goFile;
-    private final Structure structure;
+
+    private final Consumer<QualifiedName> nodeSink;
     private final BiConsumer<QualifiedName, QualifiedName> callsFiller;
 
-    public GoFileScanner(GoFile goFile, Structure structure) {
+    public GoFileScanner(GoFile goFile, Consumer<QualifiedName> nodeSink, BiConsumer<QualifiedName, QualifiedName> callSink) {
         this.goFile = goFile;
-        this.structure = structure;
-        this.callsFiller = structure::addCall;
+        this.callsFiller = callSink;
+        this.nodeSink = nodeSink;
     }
 
-    void registerEntities() {
+    public void registerEntities() {
         fillStructMethods();
         fillFunctionNames();
     }
 
-    void scanCalls() {
+    public void scanCalls() {
         visitMethods();
         visitFunctions();
     }
@@ -46,7 +48,7 @@ public class GoFileScanner {
             var structName = typeSpec.getIdentifier().getText();
             var allMethods = typeSpec.getAllMethods();
             for (GoNamedSignatureOwner method : allMethods) {
-                structure.addMethod(structName, method.getName());
+                nodeSink.accept(new QualifiedName(structName, method.getName()));
             }
         }
     }
@@ -54,7 +56,7 @@ public class GoFileScanner {
     private void fillFunctionNames() {
         Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
         for (GoFunctionDeclaration function : functions) {
-            structure.addFunction(function.getName());
+            nodeSink.accept(new QualifiedName("", function.getName()));
         }
     }
 
@@ -120,8 +122,7 @@ public class GoFileScanner {
                             }
                         } else if (resolved instanceof GoReceiver) {
                             var receiver = ((GoReceiver) resolved);
-                            sink.accept(from, new QualifiedName(typeName(receiver),
-                                    referenceExpression.getIdentifier().getText()));
+                            sink.accept(from, new QualifiedName(typeName(receiver), referenceExpression.getIdentifier().getText()));
                         }
                     } else if (firstChild instanceof GoCallExpr) {
                         System.out.println("GoCallExpr");

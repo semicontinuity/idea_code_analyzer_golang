@@ -1,4 +1,4 @@
-package semicontinuity.idea.code.analyzer.golang.actions;
+package semicontinuity.idea.code.analyzer.golang;
 
 public class QualifiedName {
     private final String qualifier;

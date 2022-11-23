@@ -4,15 +4,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goide.psi.GoFile;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
+import semicontinuity.idea.code.analyzer.golang.Structure;
+
+import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
 
 
 public class ExportItems extends AnAction {
@@ -23,26 +23,10 @@ public class ExportItems extends AnAction {
         if (goFile == null) {
             return;
         }
-        var structure = new Structure();
-        System.out.println("Populating entities");
-        process(goFile.getParent(), structure, GoFileScanner::registerEntities);
-        System.out.println("Populating calls");
-        process(goFile.getParent(), structure, GoFileScanner::scanCalls);
+        Structure structure = fillStructure(goFile);
         writeDebugGraph(toDebugGraph(structure));
     }
 
-    private static void process(PsiDirectory dir, Structure structure, Consumer<GoFileScanner> f) {
-        if (dir == null) return;
-
-        var files = dir.getFiles();
-        for (PsiFile file : files) {
-            if (file instanceof GoFile) {
-                System.out.println("######## Processing file " + file.getName());
-                GoFileScanner goFileScanner = new GoFileScanner(((GoFile) file), structure);
-                f.accept(goFileScanner);
-            }
-        }
-    }
 
     private ArrayList<List<?>> toDebugGraph(Structure s) {
         var out = new ArrayList<List<?>>();
