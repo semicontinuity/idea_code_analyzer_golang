@@ -7,7 +7,7 @@ import javax.swing.WindowConstants;
 import org.junit.jupiter.api.Test;
 import semicontinuity.idea.code.analyzer.graph.viewModel.swing.SwingViewFactory;
 
-class DAGraphViewRendererSwingTest implements DAGraphImplTestData1, DAGraphImplTestData3, DAGraphImplTestData4 {
+class DAGraphViewRendererSwingTest implements DAGraphImplTestData4, DAGraphImplTestData5 {
     static {
         System.setProperty("sun.java2d.uiScale", "4");
     }
@@ -15,6 +15,11 @@ class DAGraphViewRendererSwingTest implements DAGraphImplTestData1, DAGraphImplT
     @Test
     void render4() throws InterruptedException {
         show(exampleGraph4());
+    }
+
+    @Test
+    void render5() throws InterruptedException {
+        show(exampleGraph5());
     }
 
     private void show(DAGraph<String> graph) throws InterruptedException {
