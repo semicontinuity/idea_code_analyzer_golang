@@ -9,18 +9,9 @@ import java.util.function.Supplier;
  * Splits DAGraph into several sub-graphs, according to a provided classifier.
  * Edge of the source graph is transferred to a su-graph, if both of its nodes pertain to the same sub-graph.
  */
-public class DAGraphSplitter<N, K> {
+public class DAGraphSplitter {
 
-    private final DAGraph<N> graph;
-    private final Function<N, K> classifier;
-    private final Supplier<DAGraph<N>> subGraphFactory = DAGraphImpl::new;
-
-    public DAGraphSplitter(DAGraph<N> graph, Function<N, K> classifier) {
-        this.graph = graph;
-        this.classifier = classifier;
-    }
-
-    public Map<K, DAGraph<N>> run() {
+    public static <N, K> Map<K, DAGraph<N>> split(DAGraph<N> graph, Function<N, K> classifier, Supplier<DAGraph<N>> subGraphFactory) {
         var result = new HashMap<K, DAGraph<N>>();
 
         graph.forEachNode(n -> result.computeIfAbsent(classifier.apply(n), k -> subGraphFactory.get()).addNode(n));
