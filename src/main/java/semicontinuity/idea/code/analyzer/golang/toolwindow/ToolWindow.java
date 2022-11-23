@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import semicontinuity.idea.code.analyzer.golang.StructureSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
+import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer;
+import semicontinuity.idea.code.analyzer.graph.viewModel.swing.SwingViewFactory;
 
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
 
@@ -38,7 +40,7 @@ public class ToolWindow implements ProjectComponent {
 //    static {
 //        BasicConfigurator.configure();
 //    }
-    private GoFile lastGoFile;
+//    private GoFile lastGoFile;
 
     @SuppressWarnings({"HardCodedStringLiteral"})
     public static final String TOOL_WINDOW_ID = "Code Analysis";
@@ -163,8 +165,8 @@ public class ToolWindow implements ProjectComponent {
     }
 
     private void updateUI(final GoFile goFile) {
-        if (goFile.equals(lastGoFile)) return;
-        lastGoFile = goFile;
+//        if (goFile.equals(lastGoFile)) return;
+//        lastGoFile = goFile;
 
         myContentPanel.removeAll();
         var structure = fillStructure(goFile);
@@ -175,18 +177,22 @@ public class ToolWindow implements ProjectComponent {
     private JComponent structsView(Map<String, DAGraph<String>> structGraphs) {
         var verticalBox = Box.createVerticalBox();
         structGraphs.forEach((struct, structGraph) -> {
-            JPanel structView = structsView(struct);
+            JPanel structView = structsView(struct, structGraph);
             verticalBox.add(structView);
         });
         return verticalBox;
     }
 
     @NotNull
-    private static JPanel structsView(String struct) {
+    private static JPanel structsView(String struct, DAGraph<String> structGraph) {
         var structView = new JPanel();
         structView.setBorder(BorderFactory.createTitledBorder(struct));
-        structView.add(new JButton("TODO"));
+        structView.add(render(structGraph));
         return structView;
+    }
+
+    private static JComponent render(DAGraph<String> graph) {
+        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), (String id) -> id).render();
     }
 
     private void unregisterToolWindow() {

@@ -14,14 +14,16 @@ class DAGraphViewRendererSwingTest implements DAGraphImplTestData1, DAGraphImplT
 
     @Test
     void render4() throws InterruptedException {
-        render(exampleGraph4());
+        show(exampleGraph4());
     }
 
-    private void render(DAGraph<String> graph) throws InterruptedException {
-        var renderer = new DAGraphViewRenderer<>(graph, new SwingViewFactory(), (String id) -> id);
-        var frame = frame(renderer.render());
-//        Thread.sleep(10000);
+    private void show(DAGraph<String> graph) throws InterruptedException {
+        var frame = frame(render(graph));
         while (frame.isVisible()) Thread.sleep(100);
+    }
+
+    private static JComponent render(DAGraph<String> graph) {
+        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), (String id) -> id).render();
     }
 
     private static JFrame frame(JComponent contents) {
