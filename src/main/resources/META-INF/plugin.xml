@@ -26,6 +26,13 @@
     <depends>com.intellij.modules.go-capable</depends>
     <depends>org.jetbrains.plugins.go</depends>
 
+    <project-components>
+        <component>
+            <implementation-class>semicontinuity.idea.code.analyzer.golang.toolwindow.ToolWindow</implementation-class>
+            <interface-class>semicontinuity.idea.code.analyzer.golang.toolwindow.ToolWindow</interface-class>
+        </component>
+    </project-components>
+
     <actions>
     <action id="VssIntegration.GarbageCollection" class="semicontinuity.idea.code.analyzer.golang.actions.ExportItems"
             text="Produce Golang Report"
