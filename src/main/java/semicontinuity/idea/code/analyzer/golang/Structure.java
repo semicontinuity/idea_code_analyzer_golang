@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Structure {
     private final Map<String, Set<String>> structMethods = new HashMap<>();
@@ -25,6 +26,10 @@ public class Structure {
         } else {
             System.out.println("Out of scope: " + from + " or " + to);
         }
+    }
+
+    public void forEachNode(Consumer<QualifiedName> c) {
+        structMethods.forEach((String struct, Set<String> methods) -> methods.forEach(method -> c.accept(new QualifiedName(struct, method))));
     }
 
     public void forEachCall(BiConsumer<QualifiedName, QualifiedName> c) {
