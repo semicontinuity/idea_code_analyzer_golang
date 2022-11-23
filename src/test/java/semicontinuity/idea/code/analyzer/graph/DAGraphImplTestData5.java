@@ -15,4 +15,12 @@ public interface DAGraphImplTestData5 {
         g.addEdge("C", "c");
         return g;
     }
+
+    default DAGraph<String> exampleGraph5SubgraphABC() {
+        DAGraph<String> g = new DAGraphImpl<>();
+        g.addNode("a");
+        g.addNode("b");
+        g.addNode("c");
+        return g;
+    }
 }

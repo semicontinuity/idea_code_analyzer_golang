@@ -6,7 +6,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class DAGraphDecomposerTest implements DAGraphImplTestData1, DAGraphImplTestData2, DAGraphImplTestData3, DAGraphImplTestData4 {
+class DAGraphDecomposerTest implements
+        DAGraphImplTestData1, DAGraphImplTestData2, DAGraphImplTestData3, DAGraphImplTestData4, DAGraphImplTestData5 {
 
     @Test
     void decompose_1() {
@@ -48,6 +49,16 @@ class DAGraphDecomposerTest implements DAGraphImplTestData1, DAGraphImplTestData
                         Set.of("r2"), exampleGraph4SubgraphR2()
                 ),
                 new DAGraphDecomposer<>(exampleGraph4()).decompose()
+        );
+    }
+
+    @Test
+    void decompose_5() {
+        Assertions.assertEquals(
+                Map.of(
+                        Set.of("A", "B", "C"), exampleGraph5SubgraphABC()
+                ),
+                new DAGraphDecomposer<>(exampleGraph5()).decompose()
         );
     }
 }

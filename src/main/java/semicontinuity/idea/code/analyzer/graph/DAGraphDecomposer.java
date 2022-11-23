@@ -69,7 +69,7 @@ public class DAGraphDecomposer<N> {
         for (N nextNode : graph.followers(node)) {
             var aColor = colors.get(nextNode);
             if (!color.equals(aColor)) {
-                parents.put(aColor, color);
+                parents.put(color, aColor);
             }
             checkColorFrom(nextNode, color, colors, parents);
         }
