@@ -28,15 +28,14 @@ public class Structure {
         }
     }
 
-    public void forEachNode(Consumer<QualifiedName> c) {
+    public void forEachNode(Consumer<Node> c) {
         structMethods.forEach(
-                (String struct, Set<Node> methods) -> methods.forEach(method -> c.accept(new QualifiedName(struct,
-                        method.getName())))
+                (String struct, Set<Node> methods) -> methods.forEach(c)
         );
     }
 
-    public void forEachCall(BiConsumer<QualifiedName, QualifiedName> c) {
-        calls.forEach((from, toSet) -> toSet.forEach(to -> c.accept(from.toQualifiedName(), to.toQualifiedName())));
+    public void forEachCall(BiConsumer<Node, Node> c) {
+        calls.forEach((from, toSet) -> toSet.forEach(to -> c.accept(from, to)));
     }
 
     boolean contains(Node node) {

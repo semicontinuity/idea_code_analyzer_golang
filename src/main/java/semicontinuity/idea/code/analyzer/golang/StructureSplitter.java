@@ -12,14 +12,14 @@ import semicontinuity.idea.code.analyzer.graph.DAGraph;
  */
 public class StructureSplitter {
 
-    public static Map<String, DAGraph<String>> split(Structure graph, Supplier<DAGraph<String>> subGraphFactory) {
-        var result = new HashMap<String, DAGraph<String>>();
+    public static Map<String, DAGraph<Node>> split(Structure graph, Supplier<DAGraph<Node>> subGraphFactory) {
+        var result = new HashMap<String, DAGraph<Node>>();
 
-        graph.forEachNode(n -> result.computeIfAbsent(n.getQualifier(), k -> subGraphFactory.get()).addNode(n.getName()));
+        graph.forEachNode(n -> result.computeIfAbsent(n.getQualifier(), k -> subGraphFactory.get()).addNode(n));
 
-        graph.forEachCall((QualifiedName n1, QualifiedName n2) -> {
+        graph.forEachCall((Node n1, Node n2) -> {
             if (Objects.equals(n1.getQualifier(), n2.getQualifier())) {
-                result.computeIfAbsent(n1.getQualifier(), k -> subGraphFactory.get()).addEdge(n1.getName(), n2.getName());
+                result.computeIfAbsent(n1.getQualifier(), k -> subGraphFactory.get()).addEdge(n1, n2);
             }
         });
 

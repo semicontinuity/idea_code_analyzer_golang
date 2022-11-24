@@ -27,6 +27,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import semicontinuity.idea.code.analyzer.golang.Node;
 import semicontinuity.idea.code.analyzer.golang.StructureSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
@@ -174,7 +175,7 @@ public class ToolWindow implements ProjectComponent {
         myContentPanel.add(structsView(structGraphs));
     }
 
-    private JComponent structsView(Map<String, DAGraph<String>> structGraphs) {
+    private JComponent structsView(Map<String, DAGraph<Node>> structGraphs) {
         var verticalBox = Box.createVerticalBox();
         structGraphs.forEach((struct, structGraph) -> {
             JPanel structView = structView(struct, structGraph);
@@ -184,7 +185,7 @@ public class ToolWindow implements ProjectComponent {
     }
 
     @NotNull
-    private static JPanel structView(String struct, DAGraph<String> structGraph) {
+    private static JPanel structView(String struct, DAGraph<Node> structGraph) {
         var structView = new JPanel();
         structView.setLayout(new BorderLayout());
         structView.setBorder(BorderFactory.createTitledBorder(struct));
@@ -192,8 +193,8 @@ public class ToolWindow implements ProjectComponent {
         return structView;
     }
 
-    private static JComponent render(DAGraph<String> graph) {
-        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), (String id) -> id).render();
+    private static JComponent render(DAGraph<Node> graph) {
+        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), Node::getName).render();
     }
 
     private void unregisterToolWindow() {
