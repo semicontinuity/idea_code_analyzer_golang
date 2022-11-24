@@ -8,18 +8,18 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Structure {
-    private final Map<String, Set<String>> structMethods = new HashMap<>();
+    private final Map<String, Set<Node>> structMethods = new HashMap<>();
 
-    final Map<QualifiedName, Set<QualifiedName>> calls = new HashMap<>();
+    final Map<Node, Set<Node>> calls = new HashMap<>();
 
-    public void add(QualifiedName node) {
+    public void add(Node node) {
         System.out.println("Adding " + node);
         structMethods
                 .computeIfAbsent(node.getQualifier(), (k) -> new HashSet<>())
-                .add(node.getName());
+                .add(node);
     }
 
-    public void addCall(QualifiedName from, QualifiedName to) {
+    public void addCall(Node from, Node to) {
         if (contains(from) && contains(to)) {
             System.out.println("Adding call " + from + "->" + to);
             calls.computeIfAbsent(from, (k) -> new HashSet<>()).add(to);
@@ -29,18 +29,17 @@ public class Structure {
     }
 
     public void forEachNode(Consumer<QualifiedName> c) {
-        structMethods.forEach((String struct, Set<String> methods) -> methods.forEach(method -> c.accept(new QualifiedName(struct, method))));
+        structMethods.forEach(
+                (String struct, Set<Node> methods) -> methods.forEach(method -> c.accept(new QualifiedName(struct,
+                        method.getName())))
+        );
     }
 
     public void forEachCall(BiConsumer<QualifiedName, QualifiedName> c) {
-        calls.forEach((from, toSet) -> toSet.forEach(to -> c.accept(from, to)));
+        calls.forEach((from, toSet) -> toSet.forEach(to -> c.accept(from.toQualifiedName(), to.toQualifiedName())));
     }
 
-    boolean contains(QualifiedName qName) {
-        return structMethods.containsKey(qName.getQualifier()) && structMethods.get(qName.getQualifier()).contains(qName.getName());
-    }
-
-    public Set<String> structNames() {
-        return structMethods.keySet();
+    boolean contains(Node node) {
+        return structMethods.containsKey(node.getQualifier()) && structMethods.get(node.getQualifier()).contains(node);
     }
 }
