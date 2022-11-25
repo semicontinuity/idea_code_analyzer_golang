@@ -123,7 +123,8 @@ public class GoFileScanner {
                             }
                         } else if (resolved instanceof GoReceiver) {
                             var receiver = ((GoReceiver) resolved);
-                            edgesSink.accept(from, new Node(typeName(receiver), referenceExpression.getIdentifier().getText(), resolved));
+                            var methodBody = referenceExpression.getReference().resolve(ResolveState.initial());
+                            edgesSink.accept(from, new Node(typeName(receiver), referenceExpression.getIdentifier().getText(), methodBody));
                         }
                     } else if (firstChild instanceof GoCallExpr) {
                         System.out.println("GoCallExpr");

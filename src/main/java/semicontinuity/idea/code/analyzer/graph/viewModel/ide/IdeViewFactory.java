@@ -28,6 +28,7 @@ public class IdeViewFactory implements Factory<
         var box = Box.createHorizontalBox();
         box.add(new IdeButton(node.getPsiElement(), node.getName(), methodIcon));
         box.add(Box.createHorizontalGlue());
+        box.add(Box.createHorizontalGlue());
         return box;
     }
 
