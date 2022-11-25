@@ -21,6 +21,10 @@ public class Node {
         return name;
     }
 
+    public PsiElement getPsiElement() {
+        return psiElement;
+    }
+
     @Override
     public String toString() {
         return qualifier.isEmpty() ? name : qualifier + '.' + name;

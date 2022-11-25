@@ -3,6 +3,7 @@ package semicontinuity.idea.code.analyzer.golang.toolwindow;
 import java.awt.BorderLayout;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -32,7 +33,7 @@ import semicontinuity.idea.code.analyzer.golang.StructureSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer;
-import semicontinuity.idea.code.analyzer.graph.viewModel.swing.SwingViewFactory;
+import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeViewFactory;
 
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
 
@@ -194,7 +195,7 @@ public class ToolWindow implements ProjectComponent {
     }
 
     private static JComponent render(DAGraph<Node> graph) {
-        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), Node::getName).render();
+        return new DAGraphViewRenderer<>(graph, new IdeViewFactory(), Function.identity()).render();
     }
 
     private void unregisterToolWindow() {
