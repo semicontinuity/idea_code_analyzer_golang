@@ -23,9 +23,8 @@ public class IdeButtonHighlightingDispatcher implements Consumer<Node> {
         deselectAll();
         mapping.get(node).select(NodeHighlightingKind.SUBJECT);
 
-        graph.forEachUpstreamNode(node, caller -> {
-            mapping.get(caller).select(NodeHighlightingKind.CALLER);
-        });
+        graph.forEachUpstreamNode(node, caller -> mapping.get(caller).select(NodeHighlightingKind.CALLER));
+        graph.forEachDownstreamNode(node, callee -> mapping.get(callee).select(NodeHighlightingKind.CALLEE));
     }
 
     public void deselectAll() {

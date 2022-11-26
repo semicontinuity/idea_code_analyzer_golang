@@ -81,6 +81,11 @@ public class DAGraphImpl<N> implements DAGraph<N> {
         revEdges.get(node).forEach(consumer);
     }
 
+    @Override
+    public void forEachDownstreamNode(N node, Consumer<N> consumer) {
+        fwdEdges.get(node).forEach(consumer);
+    }
+
 
     @Override
     public List<N> findRoots() {

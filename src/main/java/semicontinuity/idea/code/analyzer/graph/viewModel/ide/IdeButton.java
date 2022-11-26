@@ -64,11 +64,11 @@ public class IdeButton extends JButton implements ActionListener {
 
     private Color background(NodeHighlightingKind kind) {
         if (kind == NodeHighlightingKind.SUBJECT) {
-            return Color.GREEN;
+            return new Color(192, 255, 192);
         } else if (kind == NodeHighlightingKind.CALLEE) {
-            return Color.BLUE;
+            return new Color(192, 192, 255);
         } else {
-            return Color.ORANGE;
+            return new Color(255, 192, 192);
         }
     }
 }

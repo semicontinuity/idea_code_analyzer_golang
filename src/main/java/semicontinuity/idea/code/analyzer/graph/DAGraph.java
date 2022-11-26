@@ -33,6 +33,7 @@ public interface DAGraph<N> {
 
 
     void forEachUpstreamNode(N node, Consumer<N> consumer);
+    void forEachDownstreamNode(N node, Consumer<N> consumer);
 
     List<N> findRoots();
 
