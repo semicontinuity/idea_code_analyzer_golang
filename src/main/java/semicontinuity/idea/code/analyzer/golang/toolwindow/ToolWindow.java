@@ -1,6 +1,8 @@
 package semicontinuity.idea.code.analyzer.golang.toolwindow;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -27,7 +29,6 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import semicontinuity.idea.code.analyzer.golang.Node;
 import semicontinuity.idea.code.analyzer.golang.StructureSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
@@ -52,7 +53,7 @@ public class ToolWindow implements ProjectComponent {
 
     private Project myProject;
     private JPanel myContentPanel;
-    private IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;
+    private List<IdeButtonHighlightingDispatcher> ideButtonHighlightingDispatchers = new ArrayList<>();
 
     private boolean includeConstructors;
 
@@ -132,7 +133,7 @@ public class ToolWindow implements ProjectComponent {
         button.addActionListener(
                 e -> SwingUtilities.invokeLater(() -> {
                     LOGGER.warn("DESELECT");
-                    ideButtonHighlightingDispatcher.deselectAll();
+                    ideButtonHighlightingDispatchers.forEach(IdeButtonHighlightingDispatcher::deselectAll);
                     panel.invalidate();   // TODO: make it work...
                     panel.validate();   // TODO: make it work...
                 }));
@@ -180,19 +181,21 @@ public class ToolWindow implements ProjectComponent {
     }
 
     private JComponent structsView(Map<String, DAGraph<Node>> structGraphs) {
-        ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher();
-        var viewFactory = new IdeViewFactory(ideButtonHighlightingDispatcher);
+        ideButtonHighlightingDispatchers.clear();
 
         var verticalBox = Box.createVerticalBox();
         structGraphs.forEach((struct, structGraph) -> {
-            JPanel structView = structView(struct, structGraph, viewFactory);
+            JPanel structView = structView(struct, structGraph);
             verticalBox.add(structView);
         });
         return verticalBox;
     }
 
-    @NotNull
-    private static JPanel structView(String struct, DAGraph<Node> structGraph, IdeViewFactory viewFactory) {
+    private JPanel structView(String struct, DAGraph<Node> structGraph) {
+        var ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher();
+        ideButtonHighlightingDispatchers.add(ideButtonHighlightingDispatcher);
+        var viewFactory = new IdeViewFactory(ideButtonHighlightingDispatcher);
+
         var structView = new JPanel();
         structView.setLayout(new BorderLayout());
         structView.setBorder(BorderFactory.createTitledBorder(struct));
