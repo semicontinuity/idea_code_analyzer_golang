@@ -32,6 +32,8 @@ public interface DAGraph<N> {
     void forEachEdge(BiConsumer<N, N> consumer);
 
 
+    void forEachUpstreamNode(N node, Consumer<N> consumer);
+
     List<N> findRoots();
 
     Set<N> followers(N node);

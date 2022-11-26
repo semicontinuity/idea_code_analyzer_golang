@@ -4,9 +4,15 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.graph.DAGraph;
 
 public class IdeButtonHighlightingDispatcher implements Consumer<Node> {
     private final HashMap<Node, IdeButton> mapping = new HashMap<>();
+    private final DAGraph<Node> graph;
+
+    public IdeButtonHighlightingDispatcher(DAGraph<Node> graph) {
+        this.graph = graph;
+    }
 
     public void register(Node node, IdeButton button) {
         mapping.put(node, button);
@@ -16,6 +22,10 @@ public class IdeButtonHighlightingDispatcher implements Consumer<Node> {
     public void accept(Node node) {
         deselectAll();
         mapping.get(node).select(NodeHighlightingKind.SUBJECT);
+
+        graph.forEachUpstreamNode(node, caller -> {
+            mapping.get(caller).select(NodeHighlightingKind.CALLER);
+        });
     }
 
     public void deselectAll() {

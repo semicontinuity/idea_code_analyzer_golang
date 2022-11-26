@@ -51,7 +51,7 @@ public class ToolWindow implements ProjectComponent {
     public static final Logger LOGGER = Logger.getLogger(ToolWindow.class);
 
 
-    private Project myProject;
+    private final Project myProject;
     private JPanel myContentPanel;
     private List<IdeButtonHighlightingDispatcher> ideButtonHighlightingDispatchers = new ArrayList<>();
 
@@ -192,7 +192,7 @@ public class ToolWindow implements ProjectComponent {
     }
 
     private JPanel structView(String struct, DAGraph<Node> structGraph) {
-        var ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher();
+        var ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher(structGraph);
         ideButtonHighlightingDispatchers.add(ideButtonHighlightingDispatcher);
         var viewFactory = new IdeViewFactory(ideButtonHighlightingDispatcher);
 

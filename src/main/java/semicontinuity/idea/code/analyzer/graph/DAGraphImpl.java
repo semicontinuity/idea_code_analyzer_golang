@@ -61,18 +61,24 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     }
 
     @Override
-    public int incomingEdgeCount(N node) {
-        var edges = revEdges.get(node);
-        return edges == null ? 0 : edges.size();
-    }
-
-    @Override
     public void forEachEdge(BiConsumer<N, N> consumer) {
         for (Map.Entry<N, Set<N>> e : fwdEdges.entrySet()) {
             for (N n : e.getValue()) {
                 consumer.accept(e.getKey(), n);
             }
         }
+    }
+
+
+    @Override
+    public int incomingEdgeCount(N node) {
+        var edges = revEdges.get(node);
+        return edges == null ? 0 : edges.size();
+    }
+
+    @Override
+    public void forEachUpstreamNode(N node, Consumer<N> consumer) {
+        revEdges.get(node).forEach(consumer);
     }
 
 
