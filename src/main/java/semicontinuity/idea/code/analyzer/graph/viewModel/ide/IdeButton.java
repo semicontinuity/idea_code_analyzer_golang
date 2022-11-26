@@ -54,7 +54,7 @@ public class IdeButton extends JButton implements ActionListener {
     }
 
 
-    public void select(int kind) {
+    public void select(NodeHighlightingKind kind) {
         setBackground(background(kind));
     }
 
@@ -62,10 +62,10 @@ public class IdeButton extends JButton implements ActionListener {
         setBackground(regularBackground);
     }
 
-    private Color background(int kind) {
-        if (kind == 0) {
+    private Color background(NodeHighlightingKind kind) {
+        if (kind == NodeHighlightingKind.SUBJECT) {
             return Color.GREEN;
-        } else if (kind > 0) {
+        } else if (kind == NodeHighlightingKind.CALLEE) {
             return Color.BLUE;
         } else {
             return Color.ORANGE;
