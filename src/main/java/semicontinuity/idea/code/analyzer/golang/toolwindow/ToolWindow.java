@@ -33,6 +33,7 @@ import semicontinuity.idea.code.analyzer.golang.StructureSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer;
+import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeButtonHighlightingDispatcher;
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeViewFactory;
 
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
@@ -51,6 +52,7 @@ public class ToolWindow implements ProjectComponent {
 
     private Project myProject;
     private JPanel myContentPanel;
+    private IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;
 
     private boolean includeConstructors;
 
@@ -117,7 +119,7 @@ public class ToolWindow implements ProjectComponent {
         button.addActionListener(
                 e -> {
                     includeConstructors = constructors.isSelected();
-                    updateUI();
+                    repaintUI();
                     panel.invalidate();   // TODO: make it work...
                     panel.validate();   // TODO: make it work...
                 });
@@ -130,6 +132,7 @@ public class ToolWindow implements ProjectComponent {
         button.addActionListener(
                 e -> SwingUtilities.invokeLater(() -> {
                     LOGGER.warn("DESELECT");
+                    ideButtonHighlightingDispatcher.deselectAll();
                     panel.invalidate();   // TODO: make it work...
                     panel.validate();   // TODO: make it work...
                 }));
@@ -147,26 +150,26 @@ public class ToolWindow implements ProjectComponent {
     }
 
 
-    public void updateUI() {
+    public void repaintUI() {
         final FileEditorManager fileEditorManager = FileEditorManager.getInstance(myProject);
         final Editor selectedTextEditor = fileEditorManager.getSelectedTextEditor();
         if (selectedTextEditor == null) return; // TODO: we can track notifications from EditorManager
 
-        updateUI(selectedTextEditor.getDocument());
+        repaintUI(selectedTextEditor.getDocument());
     }
 
 
-    private void updateUI(final Document document) {
+    private void repaintUI(final Document document) {
         final PsiDocumentManager psiDocMgr = PsiDocumentManager.getInstance(myProject);
         final PsiFile psiFile = psiDocMgr.getCachedPsiFile(document);
         if (psiFile == null) return;
 
         if (psiFile instanceof GoFile) {
-            updateUI((GoFile) psiFile);
+            repaintUI((GoFile) psiFile);
         }
     }
 
-    private void updateUI(final GoFile goFile) {
+    private void repaintUI(final GoFile goFile) {
 //        if (goFile.equals(lastGoFile)) return;
 //        lastGoFile = goFile;
 
@@ -177,25 +180,28 @@ public class ToolWindow implements ProjectComponent {
     }
 
     private JComponent structsView(Map<String, DAGraph<Node>> structGraphs) {
+        ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher();
+        var viewFactory = new IdeViewFactory(ideButtonHighlightingDispatcher);
+
         var verticalBox = Box.createVerticalBox();
         structGraphs.forEach((struct, structGraph) -> {
-            JPanel structView = structView(struct, structGraph);
+            JPanel structView = structView(struct, structGraph, viewFactory);
             verticalBox.add(structView);
         });
         return verticalBox;
     }
 
     @NotNull
-    private static JPanel structView(String struct, DAGraph<Node> structGraph) {
+    private static JPanel structView(String struct, DAGraph<Node> structGraph, IdeViewFactory viewFactory) {
         var structView = new JPanel();
         structView.setLayout(new BorderLayout());
         structView.setBorder(BorderFactory.createTitledBorder(struct));
-        structView.add(render(structGraph), BorderLayout.WEST);
+        structView.add(render(structGraph, viewFactory), BorderLayout.WEST);
         return structView;
     }
 
-    private static JComponent render(DAGraph<Node> graph) {
-        return new DAGraphViewRenderer<>(graph, new IdeViewFactory(), Function.identity()).render();
+    private static JComponent render(DAGraph<Node> graph, IdeViewFactory viewFactory) {
+        return new DAGraphViewRenderer<>(graph, viewFactory, Function.identity()).render();
     }
 
     private void unregisterToolWindow() {

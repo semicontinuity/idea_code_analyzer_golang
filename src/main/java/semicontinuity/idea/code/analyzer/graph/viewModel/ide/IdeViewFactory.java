@@ -23,10 +23,17 @@ public class IdeViewFactory implements Factory<
 
     static ImageIcon methodIcon = icon("/nodes/method.png");
 
+    private final IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;
+
+    public IdeViewFactory(IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher) {
+        this.ideButtonHighlightingDispatcher = ideButtonHighlightingDispatcher;
+    }
+
+
     @Override
     public JComponent newNode(Node node) {
         var box = Box.createHorizontalBox();
-        box.add(new IdeButton(node.getPsiElement(), node.getName(), methodIcon));
+        box.add(new IdeButton(node.getPsiElement(), node.getName(), methodIcon, node, ideButtonHighlightingDispatcher));
         box.add(Box.createHorizontalGlue());
         box.add(Box.createHorizontalGlue());
         return box;
