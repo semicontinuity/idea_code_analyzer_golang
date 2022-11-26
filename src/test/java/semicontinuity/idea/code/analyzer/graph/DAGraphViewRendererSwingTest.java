@@ -28,7 +28,7 @@ class DAGraphViewRendererSwingTest implements DAGraphImplTestData4, DAGraphImplT
     }
 
     private static JComponent render(DAGraph<String> graph) {
-        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), (String id) -> id).render();
+        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), (String id) -> id, sortKeyFunction).render();
     }
 
     private static JFrame frame(JComponent contents) {

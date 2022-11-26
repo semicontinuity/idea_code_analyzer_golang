@@ -22,6 +22,7 @@ public class IdeViewFactory implements Factory<
         > {
 
     static ImageIcon methodIcon = icon("/nodes/method.png");
+    static boolean showDebugBorders = false;
 
     private final IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;
 
@@ -44,9 +45,11 @@ public class IdeViewFactory implements Factory<
     @Override
     public JComponent newIndependentComponents(List<? extends JComponent> components) {
         var box = Box.createVerticalBox();
-        box.setForeground(Color.YELLOW);
-//        box.setBorder(BorderFactory.createEmptyBorder(4, 1, 4, 1));
-        box.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+        if (showDebugBorders)
+            box.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+        else
+            box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
         for (JComponent component : components) {
             box.add(component);
         }
@@ -56,7 +59,11 @@ public class IdeViewFactory implements Factory<
     @Override
     public JComponent newSplit(List<JComponent> items, JComponent subLayer) {
         var box = Box.createHorizontalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
+        if (showDebugBorders)
+            box.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
+        else
+            box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
         box.add(itemsBox(items));
         box.add(subLayer);
         return box;
@@ -65,7 +72,11 @@ public class IdeViewFactory implements Factory<
     @Override
     public JComponent newLayer(JComponent directDeps, JComponent sharedDeps) {
         var box = Box.createVerticalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        if (showDebugBorders)
+            box.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        else
+            box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
         if (directDeps != null) {
             box.add(directDepsBox(directDeps));
         }
@@ -77,7 +88,11 @@ public class IdeViewFactory implements Factory<
 
     JComponent itemsBox(List<JComponent> items) {
         var box = Box.createVerticalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.PINK));
+        if (showDebugBorders)
+            box.setBorder(BorderFactory.createLineBorder(Color.PINK));
+        else
+            box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
         for (JComponent component : items) {
             box.add(component);
         }
@@ -86,17 +101,22 @@ public class IdeViewFactory implements Factory<
 
     JComponent directDepsBox(JComponent contents) {
         var box = Box.createVerticalBox();
-//        box.setBackground(Color.GREEN);
-        box.setBorder(BorderFactory.createLineBorder(Color.GREEN));
-//        box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        if (showDebugBorders)
+            box.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+        else
+            box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
         box.add(contents);
         return box;
     }
 
     JComponent sharedDepsBox(JComponent contents) {
         var box = Box.createVerticalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.RED));
-//        box.setBorder(BorderFactory.createLoweredBevelBorder());
+        if (showDebugBorders)
+            box.setBorder(BorderFactory.createLineBorder(Color.RED));
+        else
+            box.setBorder(BorderFactory.createLoweredBevelBorder());
+
         box.add(contents);
         return box;
     }

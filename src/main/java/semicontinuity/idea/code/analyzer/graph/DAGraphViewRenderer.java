@@ -1,5 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,27 +9,32 @@ import java.util.stream.Collectors;
 
 import semicontinuity.idea.code.analyzer.graph.viewModel.Factory;
 
-public class DAGraphViewRenderer<N,
+public class DAGraphViewRenderer<
+        N,
         NODE_PAYLOAD,
         COMP,
         IND_COMPS extends COMP,
         NODE extends COMP,
         SPLIT extends COMP,
-        LAYER extends COMP> {
+        LAYER extends COMP,
+        SORT_KEY extends Comparable<SORT_KEY>> {
 
     private final DAGraph<N> graph;
     private final Factory<NODE_PAYLOAD, COMP, IND_COMPS, NODE, SPLIT, LAYER> viewFactory;
     private final Function<N, NODE_PAYLOAD> payloadFunction;
+    private final Function<N, SORT_KEY> sortKeyFunction;
     private final Set<N> multiNodes;
 
     public DAGraphViewRenderer(
             DAGraph<N> graph,
             Factory<NODE_PAYLOAD, COMP, IND_COMPS, NODE, SPLIT, LAYER> viewFactory,
-            Function<N, NODE_PAYLOAD> payloadFunction) {
+            Function<N, NODE_PAYLOAD> payloadFunction,
+            Function<N, SORT_KEY> sortKeyFunction) {
         this.graph = graph;
         this.viewFactory = viewFactory;
         this.payloadFunction = payloadFunction;
         this.multiNodes = graph.nodes().stream().filter(n -> graph.incomingEdgeCount(n) > 1).collect(Collectors.toSet());
+        this.sortKeyFunction = sortKeyFunction;
     }
 
 
@@ -61,6 +67,7 @@ public class DAGraphViewRenderer<N,
         var subGraph = rootsWithSubgraph.getValue();
 
         var rootsViews = roots.stream()
+                .sorted(Comparator.comparing(sortKeyFunction))
                 .map(r -> viewFactory.newNode(payloadFunction.apply(r)))
                 .collect(Collectors.toList());
 
@@ -85,6 +92,7 @@ public class DAGraphViewRenderer<N,
         return graph.nodes()
                 .stream()
                 .filter(n -> multiNodes.contains(n) == isMultiNode)
+                .sorted(Comparator.comparing(sortKeyFunction))
                 .map(node -> viewFactory.newNode(payloadFunction.apply(node)))
                 .collect(Collectors.toList());
     }

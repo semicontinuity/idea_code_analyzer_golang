@@ -204,7 +204,7 @@ public class ToolWindow implements ProjectComponent {
     }
 
     private static JComponent render(DAGraph<Node> graph, IdeViewFactory viewFactory) {
-        return new DAGraphViewRenderer<>(graph, viewFactory, Function.identity()).render();
+        return new DAGraphViewRenderer<>(graph, viewFactory, Function.identity(), Node::getName).render();
     }
 
     private void unregisterToolWindow() {

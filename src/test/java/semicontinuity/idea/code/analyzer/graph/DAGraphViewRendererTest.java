@@ -23,7 +23,7 @@ class DAGraphViewRendererTest implements DAGraphImplTestData1, DAGraphImplTestDa
     }
 
     private void render(DAGraph<String> graph) throws JsonProcessingException {
-        var renderer = new DAGraphViewRenderer<>(graph, new VFactory<>(), (String id) -> id);
+        var renderer = new DAGraphViewRenderer<>(graph, new VFactory<>(), (String id) -> id, (String s) -> s);
 
         var render = renderer.render();
         System.out.println(new ObjectMapper().writeValueAsString(render));
