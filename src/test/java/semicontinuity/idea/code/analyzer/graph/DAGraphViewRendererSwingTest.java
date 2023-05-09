@@ -7,7 +7,7 @@ import javax.swing.WindowConstants;
 import org.junit.jupiter.api.Test;
 import semicontinuity.idea.code.analyzer.graph.viewModel.swing.SwingViewFactory;
 
-class DAGraphViewRendererSwingTest implements DAGraphImplTestData4, DAGraphImplTestData5 {
+class DAGraphViewRendererSwingTest implements DAGraphImplTestData4, DAGraphImplTestData5, DAGraphImplTestData6 {
     static {
         System.setProperty("sun.java2d.uiScale", "4");
     }
@@ -20,6 +20,16 @@ class DAGraphViewRendererSwingTest implements DAGraphImplTestData4, DAGraphImplT
     @Test
     void render5() throws InterruptedException {
         show(exampleGraph5());
+    }
+
+    @Test
+    void render6() throws InterruptedException {
+
+        // WEIRD
+        // See services/sd/internal/storage
+        // Correctly rendered here.
+        // Incorrectly in GoLand.
+        show(exampleGraph6());
     }
 
     private void show(DAGraph<String> graph) throws InterruptedException {
