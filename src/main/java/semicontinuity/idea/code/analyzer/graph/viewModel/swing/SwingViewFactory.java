@@ -21,6 +21,7 @@ public class SwingViewFactory implements Factory<
 
     @Override
     public JComponent newNode(String s) {
+        System.out.println("  newNode " + s);
         var box = Box.createHorizontalBox();
         box.add(new JButton(s));
         box.add(Box.createHorizontalGlue());

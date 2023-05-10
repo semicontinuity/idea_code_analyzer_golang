@@ -26,7 +26,7 @@ class DAGraphViewRendererSwingTest implements DAGraphImplTestData4, DAGraphImplT
     void render6() throws InterruptedException {
 
         // WEIRD
-        // See services/sd/internal/storage
+        // See platform/services/sd/internal/storage
         // Correctly rendered here.
         // Incorrectly in GoLand.
         show(exampleGraph6());
@@ -42,7 +42,6 @@ class DAGraphViewRendererSwingTest implements DAGraphImplTestData4, DAGraphImplT
     }
 
     private static JFrame frame(JComponent contents) {
-
         var f = new JFrame("test");
         f.setContentPane(contents);
         f.pack();

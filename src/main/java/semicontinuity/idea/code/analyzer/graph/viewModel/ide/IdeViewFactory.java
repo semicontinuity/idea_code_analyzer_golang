@@ -33,6 +33,7 @@ public class IdeViewFactory implements Factory<
 
     @Override
     public JComponent newNode(Node node) {
+        System.out.println("  newNode " + node);
         var box = Box.createHorizontalBox();
         var ideButton = new IdeButton(node.getPsiElement(), node.getName(), methodIcon, node, ideButtonHighlightingDispatcher);
         box.add(ideButton);

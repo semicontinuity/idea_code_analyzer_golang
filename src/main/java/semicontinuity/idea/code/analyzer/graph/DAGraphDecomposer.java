@@ -17,7 +17,9 @@ public class DAGraphDecomposer<N> {
     }
 
     public Map<Set<N>, DAGraph<N>> decompose() {
-        return decomposeFrom(graph.findRoots());
+        var roots = graph.findRoots();
+        System.out.println("| decompose: " + roots.size() + " roots = " + roots);
+        return decomposeFrom(roots);
     }
 
     public Map<Set<N>, DAGraph<N>> decomposeFrom(List<N> roots) {

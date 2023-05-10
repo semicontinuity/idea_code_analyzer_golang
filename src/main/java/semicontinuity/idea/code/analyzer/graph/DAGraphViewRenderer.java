@@ -47,19 +47,25 @@ public class DAGraphViewRenderer<
     private COMP doRender(DAGraph<N> graph) {
         if (!graph.hasNodes()) return null;
 
+        System.out.println("=================================================================================================");
+        System.out.println("doRender graph; " + graph.nodes().size() + " nodes=" + graph.nodes());
+        System.out.println("=================================================================================================");
+
         if (!graph.hasEdges()) {
+            System.out.println("| doRender: no edges");
             var direct = nodeViews(graph, false);
             var shared = nodeViews(graph, true);
             return viewFactory.newLayer(independentCompsIfManyOrNullIfZero(direct), independentCompsIfManyOrNullIfZero(shared));
+        } else {
+            var decomposed = new DAGraphDecomposer<>(graph).decompose();
+            System.out.println("| doRender: graph decomposed into " + decomposed.size());
+            var components = decomposed.entrySet()
+                    .stream()
+                    .map(this::renderRootsWithSubgraph)
+                    .collect(Collectors.toList());
+
+            return independentCompsIfManyOrNullIfZero(components);
         }
-
-        var decompose = new DAGraphDecomposer<>(graph).decompose();
-        var components = decompose.entrySet()
-                .stream()
-                .map(this::renderRootsWithSubgraph)
-                .collect(Collectors.toList());
-
-        return independentCompsIfManyOrNullIfZero(components);
     }
 
     COMP renderRootsWithSubgraph(Map.Entry<Set<N>, DAGraph<N>> rootsWithSubgraph) {
@@ -68,7 +74,11 @@ public class DAGraphViewRenderer<
 
         var rootsViews = roots.stream()
                 .sorted(Comparator.comparing(sortKeyFunction))
-                .map(r -> viewFactory.newNode(payloadFunction.apply(r)))
+                .map(r -> {
+                    var payload = payloadFunction.apply(r);
+                    System.out.println(" renderRootsWithSubgraph: root=" + payload);
+                    return viewFactory.newNode(payload);
+                })
                 .collect(Collectors.toList());
 
         var subGraphView = doRender(subGraph);
@@ -89,11 +99,16 @@ public class DAGraphViewRenderer<
 
 
     private List<NODE> nodeViews(DAGraph<N> graph, boolean isMultiNode) {
+        System.out.println("  === nodeViews isMultiNode=" + isMultiNode);
         return graph.nodes()
                 .stream()
                 .filter(n -> multiNodes.contains(n) == isMultiNode)
                 .sorted(Comparator.comparing(sortKeyFunction))
-                .map(node -> viewFactory.newNode(payloadFunction.apply(node)))
+                .map(node -> {
+                    var payload = payloadFunction.apply(node);
+                    System.out.println("  ===   nodeViews " + payload);
+                    return viewFactory.newNode(payload);
+                })
                 .collect(Collectors.toList());
     }
 }
