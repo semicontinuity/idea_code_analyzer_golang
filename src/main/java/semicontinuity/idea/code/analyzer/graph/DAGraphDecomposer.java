@@ -28,6 +28,7 @@ public class DAGraphDecomposer<N> {
         for (N root : roots) {
             paintFrom(root, root, colors);
         }
+        System.out.println("| decomposeFrom: " + roots.size() + " roots: colors=" + colors);
 
         // Traverse the graph, detecting mis-colorings:
         // If the color of a node differs form the color of its root, then it has been re-painted from another root.
@@ -41,13 +42,36 @@ public class DAGraphDecomposer<N> {
             checkColorFrom(root, root, colors, parents);
         }
 
+        System.out.println("| decomposeFrom: parents");
+        parents.forEach((key, value) -> System.out.println("  key=" + key + "\tvalue=" + value));
+        System.out.println("| decomposeFrom...");
+
+        // "Union set find"
+        var realParents = new HashMap<N, N>();
+        roots.forEach(n -> {
+            var curN = n;
+            while (true) {
+                var parent = parents.get(curN);
+                if (parent == curN) break;
+                curN = parent;
+            }
+            realParents.put(n, curN);
+        });
+
+        System.out.println("| decomposeFrom: realParents");
+        realParents.forEach((key, value) -> System.out.println("  key=" + key + "\tvalue=" + value));
+        System.out.println("| decomposeFrom...");
+
         // Invert 'parents' to produce 'rootGroups'
-        var rootGroups = parents.entrySet().stream()
+        var rootGroups = realParents.entrySet().stream()
                 .collect(Collectors.groupingBy(Map.Entry::getValue, Collectors.mapping(Map.Entry::getKey, Collectors.toSet())));
 
         // Create sub-graphs for each root group
+        System.out.println("| decomposeFrom " + rootGroups.size() + " rootGroups");
         var result = new HashMap<Set<N>, DAGraph<N>>();
         for (Set<N> rootGroup : rootGroups.values()) {
+            System.out.println("| decomposeFrom: rootGroup=" + rootGroup);
+
             var subGraph = subGraphFactory.get();
             for (N root : rootGroup) {
                 for (N nextNode : graph.followers(root)) {
@@ -70,8 +94,10 @@ public class DAGraphDecomposer<N> {
     private void checkColorFrom(N node, N color, HashMap<N, N> colors, HashMap<N, N> parents) {
         for (N nextNode : graph.followers(node)) {
             var aColor = colors.get(nextNode);
+            System.out.println("  | " + node + "[color:" + color + "] ->" + nextNode + "[color: " + aColor + "]");
             if (!color.equals(aColor)) {
                 parents.put(color, aColor);
+//                parents.put(aColor, color);
             }
             checkColorFrom(nextNode, color, colors, parents);
         }
