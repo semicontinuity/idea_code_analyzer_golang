@@ -83,14 +83,12 @@ public class ToolWindow implements ProjectComponent {
     }
 
 
-
     private void initToolWindow() {
-        final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(myProject);
-        toolWindowManager.registerToolWindow(
-                TOOL_WINDOW_ID, toolWindowContent(), ToolWindowAnchor.RIGHT);
-
-//        FileEditorManager fileEditorManager = FileEditorManager.getInstance (myProject);
-//        fileEditorManager.addFileEditorManagerListener (this);
+        var toolWindowManager = ToolWindowManager.getInstance(myProject);
+        toolWindowManager.invokeLater(
+                () -> toolWindowManager.registerToolWindow(
+                TOOL_WINDOW_ID, toolWindowContent(), ToolWindowAnchor.RIGHT)
+        );
     }
 
 
