@@ -22,7 +22,9 @@ import com.goide.psi.GoUnaryExpr;
 import com.goide.psi.GoVarDefinition;
 import com.goide.psi.GoVarSpec;
 import com.intellij.pom.PomTargetPsiElement;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.jetbrains.annotations.NotNull;
 import semicontinuity.idea.code.analyzer.util.Context;
 
@@ -203,6 +205,11 @@ public class GoFileScanner {
 //                GoExpression expression1 = goCallExpr.getExpression();
                 System.out.println("goCallExpr = " + goCallExpr.getText());
                 processCallExpr(goCallExpr, from);
+            } else if (firstChild instanceof LeafPsiElement) {
+                // plain function call?
+                Node to = new Node("", firstChild.getText(), firstChild);
+                edgeSink.accept(from, to);
+                context.logEdge(from, to);
             } else {
                 context.log.accept("firstChild is " + firstChild.getClass());
                 context.log.accept("referenceExpression = " + referenceExpression.getText());
