@@ -68,14 +68,18 @@ public class GoFileScanner {
     private void fillFunctionNames() {
         Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
         for (GoFunctionDeclaration function : functions) {
-            nodeSink.accept(new Node("", function.getName(), function));
+            if (!function.getName().startsWith("Test")) {
+                nodeSink.accept(new Node("", function.getName(), function));
+            }
         }
     }
 
     private void visitFunctions() {
         goFile.getFunctions().forEach(function -> {
             context.log.accept("    Processing calls inside function " + function.getQualifiedName());
-            function.accept(fillLinksVisitor(new Node("", function.getName(), function)));
+            if (!function.getName().startsWith("Test")) {
+                function.accept(fillLinksVisitor(new Node("", function.getName(), function)));
+            }
             System.out.println();
         });
     }
