@@ -35,7 +35,7 @@ public class StructureFiller {
             if (file instanceof GoFile) {
                 context.log.accept("");
                 context.log.accept("  Processing file " + file.getName());
-                GoFileScanner goFileScanner = new GoFileScanner(((GoFile) file), context, structure::add, structure::addCall);
+                GoFileScanner goFileScanner = new GoFileScanner(((GoFile) file), context, structure::addNode, structure::addEdge);
                 sink.accept(goFileScanner);
             }
         }

@@ -31,6 +31,12 @@ public class GoFileScanner {
     private final Context context;
 
     private final Consumer<Node> nodeSink;
+
+    // ***********************************
+    // In original impl (class Structure),
+    // an edge was added,
+    // only if both its vertices existed.
+    // ***********************************
     private final BiConsumer<Node, Node> edgesSink;
 
     public GoFileScanner(

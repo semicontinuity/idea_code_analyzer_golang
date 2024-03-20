@@ -17,15 +17,15 @@ public class Structure {
         this.log = log;
     }
 
-    public void add(Node node) {
+    public void addNode(Node node) {
         log.accept("    Adding " + node);
         structMethods
                 .computeIfAbsent(node.getQualifier(), (k) -> new HashSet<>())
                 .add(node);
     }
 
-    public void addCall(Node from, Node to) {
-        if (contains(from) && contains(to)) {
+    public void addEdge(Node from, Node to) {
+        if (containsNode(from) && containsNode(to)) {
             log.accept("      Adding call " + from + "->" + to);
             calls.computeIfAbsent(from, (k) -> new HashSet<>()).add(to);
         } else {
@@ -39,11 +39,11 @@ public class Structure {
         );
     }
 
-    public void forEachCall(BiConsumer<Node, Node> c) {
+    public void forEachEdge(BiConsumer<Node, Node> c) {
         calls.forEach((from, toSet) -> toSet.forEach(to -> c.accept(from, to)));
     }
 
-    boolean contains(Node node) {
+    boolean containsNode(Node node) {
         return structMethods.containsKey(node.getQualifier()) && structMethods.get(node.getQualifier()).contains(node);
     }
 }

@@ -17,7 +17,7 @@ public class StructureSplitter {
 
         graph.forEachNode(n -> result.computeIfAbsent(n.getQualifier(), k -> subGraphFactory.get()).addNode(n));
 
-        graph.forEachCall((Node n1, Node n2) -> {
+        graph.forEachEdge((Node n1, Node n2) -> {
             if (Objects.equals(n1.getQualifier(), n2.getQualifier())) {
                 result.computeIfAbsent(n1.getQualifier(), k -> subGraphFactory.get()).addEdge(n1, n2);
             }

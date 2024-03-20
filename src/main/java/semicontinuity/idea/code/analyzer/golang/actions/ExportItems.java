@@ -30,7 +30,7 @@ public class ExportItems extends AnAction {
 
     private ArrayList<List<?>> toDebugGraph(Structure s) {
         var out = new ArrayList<List<?>>();
-        s.forEachCall((from, to) -> out.add(List.of(from.toString(), to.toString())));
+        s.forEachEdge((from, to) -> out.add(List.of(from.toString(), to.toString())));
         return out;
     }
 
