@@ -5,14 +5,16 @@ import java.util.function.Consumer;
 import com.goide.psi.GoFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import semicontinuity.idea.code.analyzer.graph.DAGraph;
+import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
 import semicontinuity.idea.code.analyzer.util.Context;
 
 public class StructureFiller {
 
-    public static Structure fillStructure(GoFile goFile) {
+    public static DAGraph<Node> fillStructure(GoFile goFile) {
         Context context = new Context();
 
-        var structure = new Structure(context.log);
+        var structure = new DAGraphImpl<Node>();
         context.log.accept("");
         context.log.accept("");
         context.log.accept("");
@@ -28,7 +30,7 @@ public class StructureFiller {
         return structure;
     }
 
-    private static void process(PsiDirectory dir, Structure structure, Consumer<GoFileScanner> sink, Context context) {
+    private static void process(PsiDirectory dir, DAGraph<Node> structure, Consumer<GoFileScanner> sink, Context context) {
         if (dir == null) return;
         var files = dir.getFiles();
         for (PsiFile file : files) {

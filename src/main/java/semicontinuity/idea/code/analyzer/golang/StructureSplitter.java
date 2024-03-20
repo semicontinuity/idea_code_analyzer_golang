@@ -8,11 +8,11 @@ import java.util.function.Supplier;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 
 /**
- * Splits Structure into several sub-graphs, one per struct.
+ * Splits call graph into several sub-graphs, one per struct.
  */
 public class StructureSplitter {
 
-    public static Map<String, DAGraph<Node>> split(Structure graph, Supplier<DAGraph<Node>> subGraphFactory) {
+    public static Map<String, DAGraph<Node>> split(DAGraph<Node> graph, Supplier<DAGraph<Node>> subGraphFactory) {
         var result = new HashMap<String, DAGraph<Node>>();
 
         graph.forEachNode(n -> result.computeIfAbsent(n.getQualifier(), k -> subGraphFactory.get()).addNode(n));

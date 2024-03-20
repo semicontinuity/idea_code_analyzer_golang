@@ -10,7 +10,8 @@ import com.goide.psi.GoFile;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import semicontinuity.idea.code.analyzer.golang.Structure;
+import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.graph.DAGraph;
 
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
 
@@ -23,12 +24,12 @@ public class ExportItems extends AnAction {
         if (goFile == null) {
             return;
         }
-        Structure structure = fillStructure(goFile);
+        DAGraph<Node> structure = fillStructure(goFile);
         writeDebugGraph(toDebugGraph(structure));
     }
 
 
-    private ArrayList<List<?>> toDebugGraph(Structure s) {
+    private ArrayList<List<?>> toDebugGraph(DAGraph<Node> s) {
         var out = new ArrayList<List<?>>();
         s.forEachEdge((from, to) -> out.add(List.of(from.toString(), to.toString())));
         return out;
