@@ -19,15 +19,22 @@ import com.goide.psi.GoUnaryExpr;
 import com.goide.psi.GoVarDefinition;
 import com.intellij.psi.ResolveState;
 import org.jetbrains.annotations.NotNull;
+import semicontinuity.idea.code.analyzer.util.Context;
 
 public class GoFileScanner {
     private final GoFile goFile;
+    private final Context context;
 
     private final Consumer<Node> nodeSink;
     private final BiConsumer<Node, Node> edgesSink;
 
-    public GoFileScanner(GoFile goFile, Consumer<Node> nodeSink, BiConsumer<Node, Node> edgesSink) {
+    public GoFileScanner(
+            GoFile goFile,
+            Context context,
+            Consumer<Node> nodeSink,
+            BiConsumer<Node, Node> edgesSink) {
         this.goFile = goFile;
+        this.context = context;
         this.edgesSink = edgesSink;
         this.nodeSink = nodeSink;
     }
@@ -62,8 +69,9 @@ public class GoFileScanner {
 
     private void visitFunctions() {
         goFile.getFunctions().forEach(function -> {
-            System.out.println("Processing calls inside function " + function.getQualifiedName());
+            context.log.accept("    Processing calls inside function " + function.getQualifiedName());
             function.accept(fillLinksVisitor(new Node("", function.getName(), function)));
+            System.out.println();
         });
     }
 
@@ -72,7 +80,7 @@ public class GoFileScanner {
         // method.getName()
         goFile.getMethods().forEach(
                 method -> {
-                    System.out.println("Processing calls inside method " + method.getQualifiedName());
+                    context.log.accept("    Processing calls inside method " + method.getQualifiedName());
                     method.accept(
                             fillLinksVisitor(
                                     new Node(
@@ -92,48 +100,52 @@ public class GoFileScanner {
             @Override
             public void visitCallExpr(@NotNull GoCallExpr callExpr) {
                 super.visitCallExpr(callExpr);
-
-                var expression = callExpr.getExpression();
-//                System.out.println("expression.getText() = " + expression.getText());
-                if (expression instanceof GoReferenceExpression) {
-                    var referenceExpression = (GoReferenceExpression) expression;
-                    var firstChild = referenceExpression.getFirstChild();
-
-                    if (firstChild instanceof GoReferenceExpression) {
-                        var refExpr = ((GoReferenceExpression) firstChild);
-                        var resolved = refExpr.resolve(ResolveState.initial());
-                        if (resolved instanceof GoVarDefinition) {
-                            var varDefinition = (GoVarDefinition) resolved;
-                            var varDefinitionParent = varDefinition.getParent();
-
-                            if (varDefinitionParent instanceof GoShortVarDeclaration) {
-                                var shortVarDeclaration = (GoShortVarDeclaration) varDefinitionParent;
-                                var literal = shortVarDeclaration.getLastChild();
-                                if (literal instanceof GoCompositeLit) {
-                                    var literalValue = (GoCompositeLit) literal;
-                                    var structName = literalValue.getTypeReferenceExpression().getText();
-
-                                    edgesSink.accept(from, new Node(structName, referenceExpression.getIdentifier().getText(), resolved));
-                                    edgesSink.accept(from, new Node(structName, referenceExpression.getIdentifier().getText(), resolved));
-                                } else if (literal instanceof GoUnaryExpr) {
-                                    var unaryExpr = (GoUnaryExpr) literal;
-                                    var structName = unaryExpr.getExpression().getGoType(ResolveState.initial()).getText();
-                                    edgesSink.accept(from, new Node(structName, referenceExpression.getIdentifier().getText(), resolved));
-                                }
-                            }
-                        } else if (resolved instanceof GoReceiver) {
-                            var receiver = ((GoReceiver) resolved);
-                            var methodBody = referenceExpression.getReference().resolve(ResolveState.initial());
-                            edgesSink.accept(from, new Node(typeName(receiver), referenceExpression.getIdentifier().getText(), methodBody));
-                        }
-                    } else if (firstChild instanceof GoCallExpr) {
-                        System.out.println("GoCallExpr");
-                    }
-                } else {
-//                    System.out.println("expression.getText() = " + expression.getText());
-                }
+                processCallExpr(callExpr, from);
             }
         };
+    }
+
+    private void processCallExpr(@NotNull GoCallExpr callExpr, Node from) {
+        var expression = callExpr.getExpression();
+//                System.out.println("expression.getText() = " + expression.getText());
+        if (expression instanceof GoReferenceExpression) {
+            var referenceExpression = (GoReferenceExpression) expression;
+            var firstChild = referenceExpression.getFirstChild();
+
+            if (firstChild instanceof GoReferenceExpression) {
+                var refExpr = ((GoReferenceExpression) firstChild);
+                var resolved = refExpr.resolve(ResolveState.initial());
+                if (resolved instanceof GoVarDefinition) {
+                    var varDefinition = (GoVarDefinition) resolved;
+                    var varDefinitionParent = varDefinition.getParent();
+
+                    if (varDefinitionParent instanceof GoShortVarDeclaration) {
+                        var shortVarDeclaration = (GoShortVarDeclaration) varDefinitionParent;
+                        var literal = shortVarDeclaration.getLastChild();
+                        if (literal instanceof GoCompositeLit) {
+                            var literalValue = (GoCompositeLit) literal;
+                            var structName = literalValue.getTypeReferenceExpression().getText();
+
+                            edgesSink.accept(from, new Node(structName, referenceExpression.getIdentifier().getText(), resolved));
+                            edgesSink.accept(from, new Node(structName, referenceExpression.getIdentifier().getText(), resolved));
+                        } else if (literal instanceof GoUnaryExpr) {
+                            var unaryExpr = (GoUnaryExpr) literal;
+                            var structName = unaryExpr.getExpression().getGoType(ResolveState.initial()).getText();
+                            edgesSink.accept(from, new Node(structName, referenceExpression.getIdentifier().getText(), resolved));
+                        }
+                    }
+                } else if (resolved instanceof GoReceiver) {
+                    var receiver = ((GoReceiver) resolved);
+                    var methodBody = referenceExpression.getReference().resolve(ResolveState.initial());
+                    edgesSink.accept(from, new Node(typeName(receiver), referenceExpression.getIdentifier().getText(), methodBody));
+                }
+            } else if (firstChild instanceof GoCallExpr) {
+                GoCallExpr goCallExpr = (GoCallExpr) firstChild;
+                context.log.accept("      GoCallExpr");
+//                GoExpression expression1 = goCallExpr.getExpression();
+                processCallExpr(goCallExpr, from);
+            }
+        }
     }
 
     private static String typeName(GoReceiver receiver) {

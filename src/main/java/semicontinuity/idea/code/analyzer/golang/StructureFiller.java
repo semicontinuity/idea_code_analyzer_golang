@@ -5,27 +5,38 @@ import java.util.function.Consumer;
 import com.goide.psi.GoFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import semicontinuity.idea.code.analyzer.util.Context;
 
 public class StructureFiller {
 
     public static Structure fillStructure(GoFile goFile) {
+        Context context = new Context();
+
         var structure = new Structure();
-        System.out.println("Populating entities");
-        process(goFile.getParent(), structure, GoFileScanner::registerEntities);
-        System.out.println("Populating calls");
-        process(goFile.getParent(), structure, GoFileScanner::scanCalls);
+        context.log.accept("");
+        context.log.accept("");
+        context.log.accept("");
+        context.log.accept("Populating entities");
+        process(goFile.getParent(), structure, GoFileScanner::registerEntities, context);
+
+        context.log.accept("");
+        context.log.accept("");
+        context.log.accept("");
+        context.log.accept("Populating calls");
+        process(goFile.getParent(), structure, GoFileScanner::scanCalls, context);
+
         return structure;
     }
 
-    private static void process(PsiDirectory dir, Structure structure, Consumer<GoFileScanner> f) {
+    private static void process(PsiDirectory dir, Structure structure, Consumer<GoFileScanner> sink, Context context) {
         if (dir == null) return;
-
         var files = dir.getFiles();
         for (PsiFile file : files) {
             if (file instanceof GoFile) {
-                System.out.println("######## Processing file " + file.getName());
-                GoFileScanner goFileScanner = new GoFileScanner(((GoFile) file), structure::add, structure::addCall);
-                f.accept(goFileScanner);
+                context.log.accept("");
+                context.log.accept("  Processing file " + file.getName());
+                GoFileScanner goFileScanner = new GoFileScanner(((GoFile) file), context, structure::add, structure::addCall);
+                sink.accept(goFileScanner);
             }
         }
     }

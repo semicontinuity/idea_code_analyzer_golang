@@ -13,7 +13,7 @@ public class Structure {
     final Map<Node, Set<Node>> calls = new HashMap<>();
 
     public void add(Node node) {
-        System.out.println("Adding " + node);
+        System.out.println("    Adding " + node);
         structMethods
                 .computeIfAbsent(node.getQualifier(), (k) -> new HashSet<>())
                 .add(node);
@@ -21,10 +21,10 @@ public class Structure {
 
     public void addCall(Node from, Node to) {
         if (contains(from) && contains(to)) {
-            System.out.println("Adding call " + from + "->" + to);
+            System.out.println("      Adding call " + from + "->" + to);
             calls.computeIfAbsent(from, (k) -> new HashSet<>()).add(to);
         } else {
-            System.out.println("Out of scope: " + from + " or " + to);
+            System.out.println("      Out of scope: " + from + " or " + to);
         }
     }
 
