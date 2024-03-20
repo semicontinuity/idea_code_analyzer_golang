@@ -12,7 +12,7 @@ public class StructureFiller {
     public static Structure fillStructure(GoFile goFile) {
         Context context = new Context();
 
-        var structure = new Structure();
+        var structure = new Structure(context.log);
         context.log.accept("");
         context.log.accept("");
         context.log.accept("");

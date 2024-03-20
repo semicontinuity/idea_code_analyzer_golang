@@ -8,12 +8,17 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Structure {
+    private final Consumer<String> log;
     private final Map<String, Set<Node>> structMethods = new HashMap<>();
 
     final Map<Node, Set<Node>> calls = new HashMap<>();
 
+    public Structure(Consumer<String> log) {
+        this.log = log;
+    }
+
     public void add(Node node) {
-        System.out.println("    Adding " + node);
+        log.accept("    Adding " + node);
         structMethods
                 .computeIfAbsent(node.getQualifier(), (k) -> new HashSet<>())
                 .add(node);
@@ -21,10 +26,10 @@ public class Structure {
 
     public void addCall(Node from, Node to) {
         if (contains(from) && contains(to)) {
-            System.out.println("      Adding call " + from + "->" + to);
+            log.accept("      Adding call " + from + "->" + to);
             calls.computeIfAbsent(from, (k) -> new HashSet<>()).add(to);
         } else {
-            System.out.println("      Out of scope: " + from + " or " + to);
+            log.accept("      Out of scope: " + from + " or " + to);
         }
     }
 
