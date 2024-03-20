@@ -13,7 +13,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import semicontinuity.idea.code.analyzer.golang.Node;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 
-import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
+import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillCallGraph;
 
 
 public class ExportItems extends AnAction {
@@ -24,7 +24,7 @@ public class ExportItems extends AnAction {
         if (goFile == null) {
             return;
         }
-        DAGraph<Node> structure = fillStructure(goFile);
+        DAGraph<Node> structure = fillCallGraph(goFile);
         writeDebugGraph(toDebugGraph(structure));
     }
 

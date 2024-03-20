@@ -11,7 +11,7 @@ import semicontinuity.idea.code.analyzer.util.Context;
 
 public class StructureFiller {
 
-    public static DAGraph<Node> fillStructure(GoFile goFile) {
+    public static DAGraph<Node> fillCallGraph(GoFile goFile) {
         Context context = new Context();
 
         var structure = new DAGraphImpl<Node>();

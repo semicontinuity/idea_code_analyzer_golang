@@ -31,22 +31,16 @@ public class GoFileScanner {
     private final Context context;
 
     private final Consumer<Node> nodeSink;
-
-    // ***********************************
-    // In original impl (class Structure),
-    // an edge was added,
-    // only if both its vertices existed.
-    // ***********************************
-    private final BiConsumer<Node, Node> edgesSink;
+    private final BiConsumer<Node, Node> edgeSink;
 
     public GoFileScanner(
             GoFile goFile,
             Context context,
             Consumer<Node> nodeSink,
-            BiConsumer<Node, Node> edgesSink) {
+            BiConsumer<Node, Node> edgeSink) {
         this.goFile = goFile;
         this.context = context;
-        this.edgesSink = edgesSink;
+        this.edgeSink = edgeSink;
         this.nodeSink = nodeSink;
     }
 
@@ -146,13 +140,13 @@ public class GoFileScanner {
                             var structName = literalValue.getTypeReferenceExpression().getText();
 
                             Node to = new Node(structName, referenceExpression.getIdentifier().getText(), resolved);
-                            edgesSink.accept(from, to);
+                            edgeSink.accept(from, to);
                             context.logEdge(from, to);
                         } else if (literal instanceof GoUnaryExpr) {
                             var unaryExpr = (GoUnaryExpr) literal;
                             var structName = unaryExpr.getExpression().getGoType(ResolveState.initial()).getText();
                             Node to = new Node(structName, referenceExpression.getIdentifier().getText(), resolved);
-                            edgesSink.accept(from, to);
+                            edgeSink.accept(from, to);
                             context.logEdge(from, to);
                         } else if (literal instanceof GoCallExpr) {
                             processCallExpr((GoCallExpr) literal, from);
@@ -175,7 +169,7 @@ public class GoFileScanner {
 //                            context.log.accept("      GoVarSpec type " + type.getText());
                             Node to = new Node(type.getText(), referenceExpression.getIdentifier().getText(), resolved);
                             context.logEdge(from, to);
-                            edgesSink.accept(from, to);
+                            edgeSink.accept(from, to);
                         } else {
                             context.log.accept("      GoVarSpec: type is null ? " + varSpec.getText());
                         }
@@ -191,7 +185,7 @@ public class GoFileScanner {
                     var receiver = ((GoReceiver) resolved);
                     var methodBody = referenceExpression.getReference().resolve(ResolveState.initial());
                     Node to = new Node(typeName(receiver), referenceExpression.getIdentifier().getText(), methodBody);
-                    edgesSink.accept(from, to);
+                    edgeSink.accept(from, to);
                     context.logEdge(from, to);
                 } else if (resolved instanceof PomTargetPsiElement) {
                     PomTargetPsiElement targetPsiElement = (PomTargetPsiElement) resolved;

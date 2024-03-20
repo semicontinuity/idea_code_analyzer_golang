@@ -1,8 +1,6 @@
 package semicontinuity.idea.code.analyzer.golang.toolwindow;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -30,14 +28,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
 import semicontinuity.idea.code.analyzer.golang.Node;
-import semicontinuity.idea.code.analyzer.golang.StructureSplitter;
+import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer;
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeButtonHighlightingDispatcher;
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeViewFactory;
 
-import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillStructure;
+import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillCallGraph;
 
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ToolWindow implements ProjectComponent {
@@ -53,7 +51,7 @@ public class ToolWindow implements ProjectComponent {
 
     private final Project myProject;
     private JPanel myContentPanel;
-    private List<IdeButtonHighlightingDispatcher> ideButtonHighlightingDispatchers = new ArrayList<>();
+    private IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;
 
     private boolean includeConstructors;
 
@@ -131,7 +129,7 @@ public class ToolWindow implements ProjectComponent {
         button.addActionListener(
                 e -> SwingUtilities.invokeLater(() -> {
                     LOGGER.warn("DESELECT");
-                    ideButtonHighlightingDispatchers.forEach(IdeButtonHighlightingDispatcher::deselectAll);
+                    ideButtonHighlightingDispatcher.deselectAll();
                     panel.invalidate();   // TODO: make it work...
                     panel.validate();   // TODO: make it work...
                 }));
@@ -173,14 +171,13 @@ public class ToolWindow implements ProjectComponent {
 //        lastGoFile = goFile;
 
         myContentPanel.removeAll();
-        var structure = fillStructure(goFile);
-        var structGraphs = StructureSplitter.split(structure, DAGraphImpl::new);
-        myContentPanel.add(structsView(structGraphs));
+        var globalCallGraph = fillCallGraph(goFile);
+        var callGraphs = CallGraphSplitter.split(globalCallGraph, DAGraphImpl::new);
+        ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher(globalCallGraph);
+        myContentPanel.add(structsView(callGraphs));
     }
 
     private JComponent structsView(Map<String, DAGraph<Node>> structGraphs) {
-        ideButtonHighlightingDispatchers.clear();
-
         var verticalBox = Box.createVerticalBox();
         structGraphs.forEach((struct, structGraph) -> {
             JPanel structView = structView(struct, structGraph);
@@ -190,8 +187,7 @@ public class ToolWindow implements ProjectComponent {
     }
 
     private JPanel structView(String struct, DAGraph<Node> structGraph) {
-        var ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher(structGraph);
-        ideButtonHighlightingDispatchers.add(ideButtonHighlightingDispatcher);
+        // just pass one viewFactory?
         var viewFactory = new IdeViewFactory(ideButtonHighlightingDispatcher);
 
         var structView = new JPanel();

@@ -8,10 +8,10 @@ import semicontinuity.idea.code.analyzer.graph.DAGraph;
 
 public class IdeButtonHighlightingDispatcher implements Consumer<Node> {
     private final HashMap<Node, IdeButton> mapping = new HashMap<>();
-    private final DAGraph<Node> graph;
+    private final DAGraph<Node> callGraph;
 
-    public IdeButtonHighlightingDispatcher(DAGraph<Node> graph) {
-        this.graph = graph;
+    public IdeButtonHighlightingDispatcher(DAGraph<Node> callGraph) {
+        this.callGraph = callGraph;
     }
 
     public void register(Node node, IdeButton button) {
@@ -23,8 +23,8 @@ public class IdeButtonHighlightingDispatcher implements Consumer<Node> {
         deselectAll();
         mapping.get(node).select(NodeHighlightingKind.SUBJECT);
 
-        graph.forEachUpstreamNode(node, caller -> mapping.get(caller).select(NodeHighlightingKind.CALLER));
-        graph.forEachDownstreamNode(node, callee -> mapping.get(callee).select(NodeHighlightingKind.CALLEE));
+        callGraph.forEachUpstreamNode(node, caller -> mapping.get(caller).select(NodeHighlightingKind.CALLER));
+        callGraph.forEachDownstreamNode(node, callee -> mapping.get(callee).select(NodeHighlightingKind.CALLEE));
     }
 
     public void deselectAll() {

@@ -10,7 +10,7 @@ import semicontinuity.idea.code.analyzer.graph.DAGraph;
 /**
  * Splits call graph into several sub-graphs, one per struct.
  */
-public class StructureSplitter {
+public class CallGraphSplitter {
 
     public static Map<String, DAGraph<Node>> split(DAGraph<Node> graph, Supplier<DAGraph<Node>> subGraphFactory) {
         var result = new HashMap<String, DAGraph<Node>>();
