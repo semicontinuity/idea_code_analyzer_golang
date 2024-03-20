@@ -1,6 +1,7 @@
 package semicontinuity.idea.code.analyzer.golang;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -22,13 +23,54 @@ import com.goide.psi.GoUnaryExpr;
 import com.goide.psi.GoVarDefinition;
 import com.goide.psi.GoVarSpec;
 import com.intellij.pom.PomTargetPsiElement;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.jetbrains.annotations.NotNull;
 import semicontinuity.idea.code.analyzer.util.Context;
 
 public class GoFileScanner {
+    // Could not find a way to check programmatically. Plain function calls are all represented by LeafPsiElement
+    private final Set<String> builtins = Set.of(
+            "append",
+            "copy",
+            "delete",
+            "len",
+            "cap",
+            "make",
+            "max",
+            "min",
+            "new",
+            "complex",
+            "real",
+            "imag",
+            "clear",
+            "close",
+            "panic",
+            "recover",
+            "print",
+            "println",
+            "uint8",
+            "uint16",
+            "uint32",
+            "uint64",
+            "int8",
+            "int16",
+            "int32",
+            "int64",
+            "float32",
+            "float64",
+            "complex64",
+            "complex128",
+            "string",
+            "int",
+            "uint",
+            "uintptr",
+            "byte",
+            "rune",
+            "any",
+            "comparable"
+    );
+
     private final GoFile goFile;
     private final Context context;
 
@@ -206,10 +248,23 @@ public class GoFileScanner {
                 System.out.println("goCallExpr = " + goCallExpr.getText());
                 processCallExpr(goCallExpr, from);
             } else if (firstChild instanceof LeafPsiElement) {
+//                LeafPsiElement leafPsiElement = (LeafPsiElement) firstChild;
+
                 // plain function call?
-                Node to = new Node("", firstChild.getText(), firstChild);
-                edgeSink.accept(from, to);
-                context.logEdge(from, to);
+                String funcName = firstChild.getText();
+                if (!builtins.contains(funcName)) {
+                    Node to = new Node("", funcName, firstChild);
+                    edgeSink.accept(from, to);
+                    context.logEdge(from, to);
+                }
+//                context.log.accept("ref is " + leafPsiElement.getReference());
+//                context.log.accept("ref is " + leafPsiElement.getResolveScope());
+
+//                VirtualFile virtualFile = PsiUtilCore.getVirtualFile(leafPsiElement);
+//                context.log.accept("virtualFile is " + virtualFile);
+//                context.log.accept("virtualFile is " + virtualFile.getName());
+//                context.log.accept("virtualFile is " + virtualFile.exists());
+//                context.log.accept("virtualFile is " + virtualFile.getFileType());
             } else {
                 context.log.accept("firstChild is " + firstChild.getClass());
                 context.log.accept("referenceExpression = " + referenceExpression.getText());
