@@ -16,7 +16,7 @@ import semicontinuity.idea.code.analyzer.graph.DAGraph;
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillCallGraph;
 
 
-public class ExportItems extends AnAction {
+public class DumpMethodCallGraph extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {

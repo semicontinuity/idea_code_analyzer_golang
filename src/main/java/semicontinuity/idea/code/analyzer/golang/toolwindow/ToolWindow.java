@@ -1,9 +1,11 @@
 package semicontinuity.idea.code.analyzer.golang.toolwindow;
 
 import java.awt.BorderLayout;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -85,7 +87,7 @@ public class ToolWindow implements ProjectComponent {
         var toolWindowManager = ToolWindowManager.getInstance(myProject);
         toolWindowManager.invokeLater(
                 () -> toolWindowManager.registerToolWindow(
-                TOOL_WINDOW_ID, toolWindowContent(), ToolWindowAnchor.RIGHT)
+                        TOOL_WINDOW_ID, toolWindowContent(), ToolWindowAnchor.RIGHT)
         );
     }
 
@@ -150,7 +152,9 @@ public class ToolWindow implements ProjectComponent {
     public void repaintUI() {
         final FileEditorManager fileEditorManager = FileEditorManager.getInstance(myProject);
         final Editor selectedTextEditor = fileEditorManager.getSelectedTextEditor();
-        if (selectedTextEditor == null) return; // TODO: we can track notifications from EditorManager
+        if (selectedTextEditor == null) {
+            return; // TODO: we can track notifications from EditorManager
+        }
 
         repaintUI(selectedTextEditor.getDocument());
     }
@@ -159,7 +163,9 @@ public class ToolWindow implements ProjectComponent {
     private void repaintUI(final Document document) {
         final PsiDocumentManager psiDocMgr = PsiDocumentManager.getInstance(myProject);
         final PsiFile psiFile = psiDocMgr.getCachedPsiFile(document);
-        if (psiFile == null) return;
+        if (psiFile == null) {
+            return;
+        }
 
         if (psiFile instanceof GoFile) {
             repaintUI((GoFile) psiFile);
@@ -179,10 +185,14 @@ public class ToolWindow implements ProjectComponent {
 
     private JComponent structsView(Map<String, DAGraph<Node>> structGraphs) {
         var verticalBox = Box.createVerticalBox();
-        structGraphs.forEach((struct, structGraph) -> {
-            JPanel structView = structView(struct, structGraph);
-            verticalBox.add(structView);
-        });
+        structGraphs
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach((Map.Entry<String, DAGraph<Node>> e) -> verticalBox.add(
+                                structView(e.getKey(), e.getValue())
+                        )
+                );
         return verticalBox;
     }
 

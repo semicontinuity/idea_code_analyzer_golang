@@ -34,10 +34,17 @@
     </project-components>
 
     <actions>
-    <action id="VssIntegration.GarbageCollection" class="semicontinuity.idea.code.analyzer.golang.actions.ExportItems"
-            text="Produce Golang Report"
-            description="Produce golang report">
+
+    <action id="VssIntegration.GarbageCollection" class="semicontinuity.idea.code.analyzer.golang.actions.DumpMethodCallGraph"
+            text="Golang: Dump Method Call Graph"
+            description="Golang: dump method call graph">
     </action>
+
+    <action id="Test" class="semicontinuity.idea.code.analyzer.golang.actions.DumpStructCallGraph"
+            text="Golang: Dump Struct Call Graph"
+            description="Golang: dump struct call graph">
+    </action>
+
     </actions>
 
     <!-- Extension points defined by the plugin.
