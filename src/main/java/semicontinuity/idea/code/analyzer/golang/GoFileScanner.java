@@ -238,6 +238,8 @@ public class GoFileScanner {
                 } else if (resolved instanceof PomTargetPsiElement) {
                     PomTargetPsiElement targetPsiElement = (PomTargetPsiElement) resolved;
                     context.log.accept("      targetPsiElement: " + targetPsiElement.getTarget());
+                } else if (resolved == null) {
+                    context.log.accept("      >> resolved is null");
                 } else {
                     context.log.accept("      >> resolved is not yet supported: " + resolved.getClass().getName() + ' ' + resolved.getText());
                 }

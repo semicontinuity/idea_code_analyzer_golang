@@ -74,7 +74,7 @@ public class DAGraphViewRenderer<
 
         var rootsViews = roots.stream()
                 .sorted(Comparator.comparing(sortKeyFunction))
-                .map(r -> {
+                .map((N r) -> {
                     var payload = payloadFunction.apply(r);
                     System.out.println(" renderRootsWithSubgraph: root=" + payload);
                     return viewFactory.newNode(payload);

@@ -15,7 +15,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicButtonUI;
 
 import com.goide.psi.GoFile;
 import com.intellij.openapi.components.ProjectComponent;
@@ -29,6 +31,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import semicontinuity.idea.code.analyzer.golang.Node;
 import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
@@ -202,9 +205,24 @@ public class ToolWindow implements ProjectComponent {
 
         var structView = new JPanel();
         structView.setLayout(new BorderLayout());
-        structView.setBorder(BorderFactory.createTitledBorder(struct));
-        structView.add(render(structGraph, viewFactory), BorderLayout.WEST);
+
+        structView.setBorder(BorderFactory.createRaisedBevelBorder());
+
+        structView.add(structButton(struct), BorderLayout.NORTH);
+
+        JComponent contents = render(structGraph, viewFactory);
+        contents.setBorder(BorderFactory.createLoweredBevelBorder());
+        structView.add(contents, BorderLayout.CENTER);
+
         return structView;
+    }
+
+    private static JButton structButton(String struct) {
+        JButton button = new JButton(struct);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setUI(new BasicButtonUI());
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+        return button;
     }
 
     private static JComponent render(DAGraph<Node> graph, IdeViewFactory viewFactory) {
