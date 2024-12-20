@@ -21,7 +21,7 @@ public class IdeViewFactory implements Factory<
         JComponent
         > {
 
-    static ImageIcon methodIcon = icon("/nodes/method.png");
+    static ImageIcon methodIcon = icon("/icons/method.png");
     static boolean showDebugBorders = false;
 
     private final IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;

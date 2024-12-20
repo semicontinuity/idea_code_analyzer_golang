@@ -117,7 +117,7 @@ public class ToolWindow implements ProjectComponent {
     private JButton repaintButton(final JPanel panel, JCheckBox constructors) {
         final JButton button = new JButton("Repaint!");
         //noinspection HardcodedFileSeparator
-        button.setIcon(new ImageIcon(Objects.requireNonNull(ToolWindow.class.getResource("/actions/refresh.png"))));
+        button.setIcon(new ImageIcon(Objects.requireNonNull(ToolWindow.class.getResource("/icons/refresh.png"))));
         button.addActionListener(
                 e -> {
                     includeConstructors = constructors.isSelected();
