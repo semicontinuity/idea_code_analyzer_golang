@@ -15,7 +15,7 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
     Analyzes Golang code.<br>
-    The goal is to hava "2D structure view"
+    The goal is to have "2D structure view"
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.

@@ -88,7 +88,7 @@ public class DAGraphViewRenderer<
     }
 
     private COMP independentCompsIfManyOrNullIfZero(List<? extends COMP> items) {
-        if (items.size() == 0) {
+        if (items.isEmpty()) {
             return null;
         } else if (items.size() == 1) {
             return items.get(0);

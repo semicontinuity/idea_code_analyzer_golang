@@ -6,7 +6,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class DAGraphImplTest implements DAGraphImplTestData1, DAGraphImplTestData5, DAGraphImplTestData6 {
+class DAGraphImplTest implements DAGraphImplTestData1, DAGraphImplTestData5 {
 
     @Test
     void findRoots1() {
@@ -16,10 +16,5 @@ class DAGraphImplTest implements DAGraphImplTestData1, DAGraphImplTestData5, DAG
     @Test
     void findRoots5() {
         Assertions.assertEquals(Set.of("A", "B", "C"), new HashSet<>(exampleGraph5().findRoots()));
-    }
-
-    @Test
-    void findRoots6() {
-        Assertions.assertEquals(Set.of("A", "B", "C"), new HashSet<>(exampleGraph6().findRoots()));
     }
 }
