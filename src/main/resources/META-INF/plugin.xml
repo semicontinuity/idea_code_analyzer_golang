@@ -50,6 +50,7 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-
+        <selectInTarget implementation="semicontinuity.idea.code.analyzer.golang.actions.CodeAnalysisSelectInTarget" />
     </extensions>
+
 </idea-plugin>

@@ -28,6 +28,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
@@ -44,13 +45,10 @@ import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillCallG
 
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ToolWindow implements ProjectComponent {
-//    static {
-//        BasicConfigurator.configure();
-//    }
-//    private GoFile lastGoFile;
 
     @SuppressWarnings({"HardCodedStringLiteral"})
     public static final String TOOL_WINDOW_ID = "Code Analysis";
+    public static final String COMPONENT_NAME = "Cat.Plugin";
     public static final Logger LOGGER = Logger.getLogger(ToolWindow.class);
 
 
@@ -58,12 +56,9 @@ public class ToolWindow implements ProjectComponent {
     private JPanel myContentPanel;
     private IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;
 
-    private boolean includeConstructors;
-
 
     @SuppressWarnings({"HardCodedStringLiteral", "StringConcatenation", "MagicCharacter", "ObjectToString"})
     public ToolWindow(final Project project) {
-        LOGGER.debug("NEW PLUGIN" + ' ' + this + ' ' + project);
         myProject = project;
     }
 
@@ -82,7 +77,7 @@ public class ToolWindow implements ProjectComponent {
     }
 
     public String getComponentName() {
-        return "Cat.Plugin";
+        return COMPONENT_NAME;
     }
 
 
@@ -120,7 +115,6 @@ public class ToolWindow implements ProjectComponent {
         button.setIcon(new ImageIcon(Objects.requireNonNull(ToolWindow.class.getResource("/icons/refresh.png"))));
         button.addActionListener(
                 e -> {
-                    includeConstructors = constructors.isSelected();
                     repaintUI();
                     panel.invalidate();   // TODO: make it work...
                     panel.validate();   // TODO: make it work...
@@ -232,5 +226,9 @@ public class ToolWindow implements ProjectComponent {
     private void unregisterToolWindow() {
         final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(myProject);
         toolWindowManager.unregisterToolWindow(TOOL_WINDOW_ID);
+    }
+
+    public void selectPsiElement(@NotNull PsiElement it) {
+
     }
 }
