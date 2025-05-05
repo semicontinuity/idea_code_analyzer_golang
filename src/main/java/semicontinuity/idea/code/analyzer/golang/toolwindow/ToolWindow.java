@@ -228,7 +228,10 @@ public class ToolWindow implements ProjectComponent {
         toolWindowManager.unregisterToolWindow(TOOL_WINDOW_ID);
     }
 
-    public void selectPsiElement(@NotNull PsiElement it) {
-
+    public void selectPsiElement(@NotNull PsiElement e) {
+        ideButtonHighlightingDispatcher.selectPsiElement(e);
+        myContentPanel.invalidate();
+        myContentPanel.validate();
+        myContentPanel.repaint();
     }
 }

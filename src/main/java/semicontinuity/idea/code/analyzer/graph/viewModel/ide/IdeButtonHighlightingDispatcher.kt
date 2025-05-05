@@ -1,33 +1,60 @@
-package semicontinuity.idea.code.analyzer.graph.viewModel.ide;
+package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
-import java.util.HashMap;
-import java.util.function.Consumer;
+import com.goide.psi.GoFile
+import com.goide.psi.GoFunctionDeclaration
+import com.goide.psi.GoMethodDeclaration
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.util.parentOfType
+import semicontinuity.idea.code.analyzer.golang.Node
+import semicontinuity.idea.code.analyzer.golang.typeName
+import semicontinuity.idea.code.analyzer.graph.DAGraph
+import java.util.function.Consumer
 
-import semicontinuity.idea.code.analyzer.golang.Node;
-import semicontinuity.idea.code.analyzer.graph.DAGraph;
+class IdeButtonHighlightingDispatcher(private val callGraph: DAGraph<Node>) :
+    Consumer<Node> {
+    private val mapping = HashMap<Node, IdeButton>()
 
-public class IdeButtonHighlightingDispatcher implements Consumer<Node> {
-    private final HashMap<Node, IdeButton> mapping = new HashMap<>();
-    private final DAGraph<Node> callGraph;
-
-    public IdeButtonHighlightingDispatcher(DAGraph<Node> callGraph) {
-        this.callGraph = callGraph;
+    fun register(node: Node, button: IdeButton) {
+        mapping[node] = button
     }
 
-    public void register(Node node, IdeButton button) {
-        mapping.put(node, button);
+    override fun accept(node: Node) {
+        deselectAll()
+        mapping[node]!!.select(NodeHighlightingKind.SUBJECT)
+
+        callGraph.forEachUpstreamNode(node) { caller: Node ->
+            mapping[caller]!!
+                .select(NodeHighlightingKind.CALLER)
+        }
+        callGraph.forEachDownstreamNode(node) { callee: Node ->
+            mapping[callee]!!
+                .select(NodeHighlightingKind.CALLEE)
+        }
     }
 
-    @Override
-    public void accept(Node node) {
-        deselectAll();
-        mapping.get(node).select(NodeHighlightingKind.SUBJECT);
-
-        callGraph.forEachUpstreamNode(node, caller -> mapping.get(caller).select(NodeHighlightingKind.CALLER));
-        callGraph.forEachDownstreamNode(node, callee -> mapping.get(callee).select(NodeHighlightingKind.CALLEE));
+    fun deselectAll() {
+        mapping.values.forEach(Consumer { obj: IdeButton -> obj.deselect() })
     }
 
-    public void deselectAll() {
-        mapping.values().forEach(IdeButton::deselect);
+    fun selectPsiElement(psiElement: PsiElement) {
+        node(psiElement)?.let { accept(it) }
+    }
+
+    fun node(psiElement: PsiElement): Node? {
+        val function = psiElement.parentOfType<GoFunctionDeclaration>()
+        if (function != null) {
+            return Node("", function.name, psiElement)
+        }
+
+        val method = psiElement.parentOfType<GoMethodDeclaration>()
+        if (method != null) {
+            val receiver = method.getReceiver()
+            if (receiver != null) {
+                return Node(typeName(receiver), method.name, psiElement)
+            }
+        }
+
+        return null
     }
 }
