@@ -16,8 +16,8 @@ public class SerializationTest {
     private Object exampleViewModel1() {
         return new VIndependentComponents(
                 List.of(
-                        new VNode<>("n20"),
-                        new VNode<>("n21")
+                        new VMember<>("n20"),
+                        new VMember<>("n21")
                 )
         );
     }

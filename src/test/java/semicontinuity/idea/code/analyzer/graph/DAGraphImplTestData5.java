@@ -18,9 +18,9 @@ public interface DAGraphImplTestData5 {
 
     default DAGraph<String> exampleGraph5SubgraphABC() {
         DAGraph<String> g = new DAGraphImpl<>();
-        g.addNode("a");
-        g.addNode("b");
-        g.addNode("c");
+        g.addVertex("a");
+        g.addVertex("b");
+        g.addVertex("c");
         return g;
     }
 }

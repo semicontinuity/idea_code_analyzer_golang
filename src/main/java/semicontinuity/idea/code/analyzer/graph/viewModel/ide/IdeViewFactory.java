@@ -9,11 +9,11 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
-import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.golang.Member;
 import semicontinuity.idea.code.analyzer.graph.viewModel.Factory;
 
 public class IdeViewFactory implements Factory<
-        Node,
+        Member,
         JComponent,
         JComponent,
         JComponent,
@@ -32,14 +32,13 @@ public class IdeViewFactory implements Factory<
 
 
     @Override
-    public JComponent newNode(Node node) {
-        System.out.println("  newNode " + node);
+    public JComponent newVertex(Member vertex) {
         var box = Box.createHorizontalBox();
-        var ideButton = new IdeButton(node.getPsiElement(), node.getName(), methodIcon, node, ideButtonHighlightingDispatcher);
+        var ideButton = new IdeButton(vertex.getPsiElement(), vertex.getName(), methodIcon, vertex, ideButtonHighlightingDispatcher);
         box.add(ideButton);
         box.add(Box.createHorizontalGlue());
         box.add(Box.createHorizontalGlue());
-        ideButtonHighlightingDispatcher.register(node, ideButton);
+        ideButtonHighlightingDispatcher.register(vertex, ideButton);
         return box;
     }
 

@@ -35,8 +35,8 @@ public interface DAGraphImplTestData4 {
 
     default DAGraph<String> exampleGraph4SubgraphR0R1() {
         DAGraph<String> g = new DAGraphImpl<>();
-        g.addNode("n0");
-        g.addNode("n1");
+        g.addVertex("n0");
+        g.addVertex("n1");
         g.addEdge("nX", "nA");
         g.addEdge("nX", "nB");
         g.addEdge("nX", "nY");

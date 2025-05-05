@@ -2,12 +2,12 @@ package semicontinuity.idea.code.analyzer.golang;
 
 import com.intellij.psi.PsiElement;
 
-public class Node {
+public class Member {
     private final String qualifier;
     private final String name;
     private final PsiElement psiElement;
 
-    public Node(String qualifier, String name, PsiElement psiElement) {
+    public Member(String qualifier, String name, PsiElement psiElement) {
         this.qualifier = qualifier;
         this.name = name;
         this.psiElement = psiElement;
@@ -43,7 +43,7 @@ public class Node {
             return false;
         }
 
-        Node that = (Node) o;
+        Member that = (Member) o;
 
         if (!qualifier.equals(that.qualifier)) {
             return false;

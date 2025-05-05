@@ -16,31 +16,31 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.golang.Member;
 
 public class IdeButton extends JButton implements ActionListener {
-    private final Node node;
-    private final Consumer<Node> actionConsumer;
+    private final Member vertex;
+    private final Consumer<Member> actionConsumer;
 
     private final PsiElement psiElement;
 
     private final Color regularBackground;
 
 
-    protected IdeButton(final PsiElement element, String text, Icon icon, Node node, Consumer<Node> actionConsumer) {
+    protected IdeButton(final PsiElement element, String text, Icon icon, Member vertex, Consumer<Member> actionConsumer) {
         super(text, icon);
         addActionListener(this);
         setBorder(BorderFactory.createEmptyBorder());
         setUI(new BasicButtonUI());
 
-        this.node = node;
+        this.vertex = vertex;
         this.actionConsumer = actionConsumer;
         psiElement = element;
         regularBackground = getBackground();
     }
 
     public void actionPerformed(ActionEvent e) {
-        actionConsumer.accept(node);
+        actionConsumer.accept(vertex);
         navigateToSource();
     }
 
@@ -54,7 +54,7 @@ public class IdeButton extends JButton implements ActionListener {
     }
 
 
-    public void select(NodeHighlightingKind kind) {
+    public void select(MemberHighlightingKind kind) {
         setBackground(background(kind));
     }
 
@@ -62,10 +62,10 @@ public class IdeButton extends JButton implements ActionListener {
         setBackground(regularBackground);
     }
 
-    private Color background(NodeHighlightingKind kind) {
-        if (kind == NodeHighlightingKind.SUBJECT) {
+    private Color background(MemberHighlightingKind kind) {
+        if (kind == MemberHighlightingKind.SUBJECT) {
             return new Color(192, 255, 192);
-        } else if (kind == NodeHighlightingKind.CALLEE) {
+        } else if (kind == MemberHighlightingKind.CALLEE) {
             return new Color(192, 192, 255);
         } else {
             return new Color(255, 192, 192);

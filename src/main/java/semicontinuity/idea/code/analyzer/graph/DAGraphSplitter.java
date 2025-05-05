@@ -7,14 +7,14 @@ import java.util.function.Supplier;
 
 /**
  * Splits DAGraph into several sub-graphs, according to a provided classifier.
- * Edge of the source graph is transferred to a su-graph, if both of its nodes pertain to the same sub-graph.
+ * Edge of the source graph is transferred to a su-graph, if both of its vertices pertain to the same sub-graph.
  */
 public class DAGraphSplitter {
 
     public static <N, K> Map<K, DAGraph<N>> split(DAGraph<N> graph, Function<N, K> classifier, Supplier<DAGraph<N>> subGraphFactory) {
         var result = new HashMap<K, DAGraph<N>>();
 
-        graph.forEachNode(n -> result.computeIfAbsent(classifier.apply(n), k -> subGraphFactory.get()).addNode(n));
+        graph.forEachVertex(n -> result.computeIfAbsent(classifier.apply(n), k -> subGraphFactory.get()).addVertex(n));
 
         graph.forEachEdge((n1, n2) -> {
             var k1 = classifier.apply(n1);

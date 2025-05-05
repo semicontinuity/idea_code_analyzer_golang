@@ -1,35 +1,33 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
-import com.goide.psi.GoFile
 import com.goide.psi.GoFunctionDeclaration
 import com.goide.psi.GoMethodDeclaration
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.util.parentOfType
-import semicontinuity.idea.code.analyzer.golang.Node
+import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.golang.typeName
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import java.util.function.Consumer
 
-class IdeButtonHighlightingDispatcher(private val callGraph: DAGraph<Node>) :
-    Consumer<Node> {
-    private val mapping = HashMap<Node, IdeButton>()
+class IdeButtonHighlightingDispatcher(private val callGraph: DAGraph<Member>) :
+    Consumer<Member> {
+    private val mapping = HashMap<Member, IdeButton>()
 
-    fun register(node: Node, button: IdeButton) {
-        mapping[node] = button
+    fun register(vertex: Member, button: IdeButton) {
+        mapping[vertex] = button
     }
 
-    override fun accept(node: Node) {
+    override fun accept(vertex: Member) {
         deselectAll()
-        mapping[node]!!.select(NodeHighlightingKind.SUBJECT)
+        mapping[vertex]!!.select(MemberHighlightingKind.SUBJECT)
 
-        callGraph.forEachUpstreamNode(node) { caller: Node ->
+        callGraph.forEachUpstreamVertex(vertex) { caller: Member ->
             mapping[caller]!!
-                .select(NodeHighlightingKind.CALLER)
+                .select(MemberHighlightingKind.CALLER)
         }
-        callGraph.forEachDownstreamNode(node) { callee: Node ->
+        callGraph.forEachDownstreamVertex(vertex) { callee: Member ->
             mapping[callee]!!
-                .select(NodeHighlightingKind.CALLEE)
+                .select(MemberHighlightingKind.CALLEE)
         }
     }
 
@@ -38,20 +36,24 @@ class IdeButtonHighlightingDispatcher(private val callGraph: DAGraph<Node>) :
     }
 
     fun selectPsiElement(psiElement: PsiElement) {
-        node(psiElement)?.let { accept(it) }
+        vertex(psiElement)?.let { accept(it) }
     }
 
-    fun node(psiElement: PsiElement): Node? {
+    fun vertex(psiElement: PsiElement): Member? {
         val function = psiElement.parentOfType<GoFunctionDeclaration>()
         if (function != null) {
-            return Node("", function.name, psiElement)
+            return Member("", function.name, psiElement)
         }
 
         val method = psiElement.parentOfType<GoMethodDeclaration>()
         if (method != null) {
             val receiver = method.getReceiver()
             if (receiver != null) {
-                return Node(typeName(receiver), method.name, psiElement)
+                return Member(
+                    typeName(receiver),
+                    method.name,
+                    psiElement
+                )
             }
         }
 

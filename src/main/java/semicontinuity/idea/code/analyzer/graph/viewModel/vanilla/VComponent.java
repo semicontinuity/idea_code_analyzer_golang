@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes(
         {
                 @JsonSubTypes.Type(value = VIndependentComponents.class, name = "independent"),
-                @JsonSubTypes.Type(value = VNode.class, name = "node"),
+                @JsonSubTypes.Type(value = VMember.class, name = "member"),
                 @JsonSubTypes.Type(value = VSplit.class, name = "split"),
                 @JsonSubTypes.Type(value = VLayer.class, name = "layer"),
         }

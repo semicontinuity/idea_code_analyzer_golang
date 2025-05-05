@@ -10,7 +10,7 @@ import com.goide.psi.GoFile;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.golang.Member;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillCallGraph;
@@ -24,12 +24,12 @@ public class DumpMethodCallGraph extends AnAction {
         if (goFile == null) {
             return;
         }
-        DAGraph<Node> structure = fillCallGraph(goFile);
+        DAGraph<Member> structure = fillCallGraph(goFile);
         writeDebugGraph(toDebugGraph(structure));
     }
 
 
-    private ArrayList<List<?>> toDebugGraph(DAGraph<Node> s) {
+    private ArrayList<List<?>> toDebugGraph(DAGraph<Member> s) {
         var out = new ArrayList<List<?>>();
         s.forEachEdge((from, to) -> out.add(List.of(from.toString(), to.toString())));
         return out;

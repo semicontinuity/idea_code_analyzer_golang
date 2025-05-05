@@ -13,43 +13,43 @@ public class DAGraphImpl<N> implements DAGraph<N> {
 
     boolean hasEdges;
 
-    private final HashSet<N> nodes = new HashSet<>();
+    private final HashSet<N> vertices = new HashSet<>();
 
     private final HashMap<N, Set<N>> fwdEdges = new HashMap<>();
     private final HashMap<N, Set<N>> revEdges = new HashMap<>();
 
 
     @Override
-    public void addNode(N n) {
+    public void addVertex(N n) {
         fwdEdges.computeIfAbsent(n, (k) -> new HashSet<>());
         revEdges.computeIfAbsent(n, (k) -> new HashSet<>());
-        nodes.add(n);
+        vertices.add(n);
     }
 
     @Override
-    public boolean hasNodes() {
-        return !nodes.isEmpty();
+    public boolean hasVertices() {
+        return !vertices.isEmpty();
     }
 
     @Override
-    public Set<N> nodes() {
-        return nodes;
+    public Set<N> vertices() {
+        return vertices;
     }
 
     @Override
-    public boolean containsNode(N node) {
-        return nodes.contains(node);
+    public boolean containsVertex(N vertex) {
+        return vertices.contains(vertex);
     }
 
     @Override
-    public void forEachNode(Consumer<N> consumer) {
-        nodes.forEach(consumer);
+    public void forEachVertex(Consumer<N> consumer) {
+        vertices.forEach(consumer);
     }
 
     @Override
     public void addEdge(N src, N dst) {
-        addNode(src);
-        addNode(dst);
+        addVertex(src);
+        addVertex(dst);
         fwdEdges.computeIfAbsent(src, (k) -> new HashSet<>()).add(dst);
         revEdges.computeIfAbsent(dst, (k) -> new HashSet<>()).add(src);
         hasEdges = true;
@@ -71,19 +71,19 @@ public class DAGraphImpl<N> implements DAGraph<N> {
 
 
     @Override
-    public int incomingEdgeCount(N node) {
-        var edges = revEdges.get(node);
+    public int incomingEdgeCount(N vertex) {
+        var edges = revEdges.get(vertex);
         return edges == null ? 0 : edges.size();
     }
 
     @Override
-    public void forEachUpstreamNode(N node, Consumer<N> consumer) {
-        revEdges.get(node).forEach(consumer);
+    public void forEachUpstreamVertex(N vertex, Consumer<N> consumer) {
+        revEdges.get(vertex).forEach(consumer);
     }
 
     @Override
-    public void forEachDownstreamNode(N node, Consumer<N> consumer) {
-        fwdEdges.get(node).forEach(consumer);
+    public void forEachDownstreamVertex(N vertex, Consumer<N> consumer) {
+        fwdEdges.get(vertex).forEach(consumer);
     }
 
 
@@ -96,8 +96,8 @@ public class DAGraphImpl<N> implements DAGraph<N> {
     }
 
     @Override
-    public Set<N> followers(N node) {
-        return fwdEdges.get(node);
+    public Set<N> followers(N vertex) {
+        return fwdEdges.get(vertex);
     }
 
 

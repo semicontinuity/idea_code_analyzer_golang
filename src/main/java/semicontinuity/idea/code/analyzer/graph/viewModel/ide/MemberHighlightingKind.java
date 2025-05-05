@@ -1,6 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.ide;
 
-public enum NodeHighlightingKind {
+public enum MemberHighlightingKind {
     SUBJECT,
     CALLER,
     CALLEE,

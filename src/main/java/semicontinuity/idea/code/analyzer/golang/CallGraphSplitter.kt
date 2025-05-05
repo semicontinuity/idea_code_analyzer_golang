@@ -1,28 +1,33 @@
-package semicontinuity.idea.code.analyzer.golang;
+package semicontinuity.idea.code.analyzer.golang
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
-
-import semicontinuity.idea.code.analyzer.graph.DAGraph;
+import semicontinuity.idea.code.analyzer.graph.DAGraph
+import java.util.function.Supplier
 
 /**
  * Splits call graph into several sub-graphs, one per struct.
  */
-public class CallGraphSplitter {
+object CallGraphSplitter {
 
-    public static Map<String, DAGraph<Node>> split(DAGraph<Node> graph, Supplier<DAGraph<Node>> subGraphFactory) {
-        var result = new HashMap<String, DAGraph<Node>>();
+    fun split(graph: DAGraph<Member>, subGraphFactory: Supplier<DAGraph<Member>>): Map<String, DAGraph<Member>> {
+        val subGraphs = HashMap<String, DAGraph<Member>>()
 
-        graph.forEachNode(n -> result.computeIfAbsent(n.getQualifier(), k -> subGraphFactory.get()).addNode(n));
+        graph.forEachVertex { m: Member ->
+            subGraphs.computeIfAbsent(group(m)) { k: String? -> subGraphFactory.get() }.addVertex(m)
+        }
 
-        graph.forEachEdge((Node n1, Node n2) -> {
-            if (Objects.equals(n1.getQualifier(), n2.getQualifier())) {
-                result.computeIfAbsent(n1.getQualifier(), k -> subGraphFactory.get()).addEdge(n1, n2);
+        graph.forEachEdge { m1: Member, m2: Member ->
+            if (inSameSubgraph(m1, m2)) {
+                subGraphs[group(m1)]?.addEdge(m1, m2)
             }
-        });
+        }
 
-        return result;
+        return subGraphs
     }
+
+    private fun inSameSubgraph(n1: Member, n2: Member) =
+        n1.qualifier.isNotEmpty()
+            && n2.qualifier.isNotEmpty()
+            && n1.qualifier == n2.qualifier
+
+    private fun group(m: Member): String = m.qualifier
 }

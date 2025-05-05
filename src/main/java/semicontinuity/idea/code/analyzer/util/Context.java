@@ -3,7 +3,7 @@ package semicontinuity.idea.code.analyzer.util;
 import java.io.Closeable;
 import java.io.IOException;
 
-import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.golang.Member;
 
 public class Context implements Closeable {
 
@@ -15,7 +15,7 @@ public class Context implements Closeable {
     }
 
 
-    public void logEdge(Node from, Node to) {
+    public void logEdge(Member from, Member to) {
         log.accept("        EDGE " + from.getQualifier() + '.' + from.getName() + " -> " + to.getQualifier() + "." + to.getName());
     }
 }

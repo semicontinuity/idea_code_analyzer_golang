@@ -74,18 +74,18 @@ public class GoFileScanner {
     private final GoFile goFile;
     private final Context context;
 
-    private final Consumer<Node> nodeSink;
-    private final BiConsumer<Node, Node> edgeSink;
+    private final Consumer<Member> vertexSink;
+    private final BiConsumer<Member, Member> edgeSink;
 
     public GoFileScanner(
             GoFile goFile,
             Context context,
-            Consumer<Node> nodeSink,
-            BiConsumer<Node, Node> edgeSink) {
+            Consumer<Member> vertexSink,
+            BiConsumer<Member, Member> edgeSink) {
         this.goFile = goFile;
         this.context = context;
         this.edgeSink = edgeSink;
-        this.nodeSink = nodeSink;
+        this.vertexSink = vertexSink;
     }
 
     public void registerEntities() {
@@ -102,9 +102,10 @@ public class GoFileScanner {
         Collection<? extends GoTypeSpec> types = goFile.getTypes();
         for (GoTypeSpec typeSpec : types) {
             var structName = typeSpec.getIdentifier().getText();
+            if (structName.endsWith("TestSuite")) continue;
             var allMethods = typeSpec.getAllMethods();
             for (GoNamedSignatureOwner method : allMethods) {
-                nodeSink.accept(new Node(structName, method.getName(), method));
+                vertexSink.accept(new Member(structName, method.getName(), method));
             }
         }
     }
@@ -113,7 +114,7 @@ public class GoFileScanner {
         Collection<? extends GoFunctionDeclaration> functions = goFile.getFunctions();
         for (GoFunctionDeclaration function : functions) {
             if (!function.getName().startsWith("Test")) {
-                nodeSink.accept(new Node("", function.getName(), function));
+                vertexSink.accept(new Member("", function.getName(), function));
             }
         }
     }
@@ -122,7 +123,7 @@ public class GoFileScanner {
         goFile.getFunctions().forEach(function -> {
             context.log.accept("    Processing calls inside function " + function.getQualifiedName());
             if (!function.getName().startsWith("Test")) {
-                function.accept(fillLinksVisitor(new Node("", function.getName(), function)));
+                function.accept(fillLinksVisitor(new Member("", function.getName(), function)));
             }
             System.out.println();
         });
@@ -134,10 +135,13 @@ public class GoFileScanner {
         goFile.getMethods().forEach(
                 method -> {
                     context.log.accept("    Processing calls inside method " + method.getQualifiedName());
+                    String qualifier = typeName(method.getReceiver());
+                    if (qualifier.endsWith("TestSuite")) return;
+
                     method.accept(
                             fillLinksVisitor(
-                                    new Node(
-                                            typeName(method.getReceiver()),
+                                    new Member(
+                                            qualifier,
                                             method.getName(),
                                             method
                                     )
@@ -148,7 +152,7 @@ public class GoFileScanner {
     }
 
     @NotNull
-    private GoRecursiveVisitor fillLinksVisitor(final Node from) {
+    private GoRecursiveVisitor fillLinksVisitor(final Member from) {
         return new GoRecursiveVisitor() {
             @Override
             public void visitCallExpr(@NotNull GoCallExpr callExpr) {
@@ -167,7 +171,7 @@ public class GoFileScanner {
         };
     }
 
-    private void processCallExpr(@NotNull GoCallExpr callExpr, Node from) {
+    private void processCallExpr(@NotNull GoCallExpr callExpr, Member from) {
         var expression = callExpr.getExpression();
         if (expression instanceof GoReferenceExpression) {
             var referenceExpression = (GoReferenceExpression) expression;
@@ -187,13 +191,13 @@ public class GoFileScanner {
                             var literalValue = (GoCompositeLit) literal;
                             var structName = literalValue.getTypeReferenceExpression().getText();
 
-                            Node to = new Node(structName, referenceExpression.getIdentifier().getText(), resolved);
+                            Member to = new Member(structName, referenceExpression.getIdentifier().getText(), resolved);
                             edgeSink.accept(from, to);
                             context.logEdge(from, to);
                         } else if (literal instanceof GoUnaryExpr) {
                             var unaryExpr = (GoUnaryExpr) literal;
                             var structName = unaryExpr.getExpression().getGoType(ResolveState.initial()).getText();
-                            Node to = new Node(structName, referenceExpression.getIdentifier().getText(), resolved);
+                            Member to = new Member(structName, referenceExpression.getIdentifier().getText(), resolved);
                             edgeSink.accept(from, to);
                             context.logEdge(from, to);
                         } else if (literal instanceof GoCallExpr) {
@@ -215,7 +219,7 @@ public class GoFileScanner {
 //                        context.log.accept("      GoVarSpec type " + type);
                         if (type != null) {
 //                            context.log.accept("      GoVarSpec type " + type.getText());
-                            Node to = new Node(type.getText(), referenceExpression.getIdentifier().getText(), resolved);
+                            Member to = new Member(type.getText(), referenceExpression.getIdentifier().getText(), resolved);
                             context.logEdge(from, to);
                             edgeSink.accept(from, to);
                         } else {
@@ -232,7 +236,7 @@ public class GoFileScanner {
                 } else if (resolved instanceof GoReceiver) {
                     var receiver = ((GoReceiver) resolved);
                     var methodBody = referenceExpression.getReference().resolve(ResolveState.initial());
-                    Node to = new Node(typeName(receiver), referenceExpression.getIdentifier().getText(), methodBody);
+                    Member to = new Member(typeName(receiver), referenceExpression.getIdentifier().getText(), methodBody);
                     edgeSink.accept(from, to);
                     context.logEdge(from, to);
                 } else if (resolved instanceof PomTargetPsiElement) {
@@ -255,7 +259,7 @@ public class GoFileScanner {
                 // plain function call?
                 String funcName = firstChild.getText();
                 if (!builtins.contains(funcName)) {
-                    Node to = new Node("", funcName, firstChild);
+                    Member to = new Member("", funcName, firstChild);
                     edgeSink.accept(from, to);
                     context.logEdge(from, to);
                 }

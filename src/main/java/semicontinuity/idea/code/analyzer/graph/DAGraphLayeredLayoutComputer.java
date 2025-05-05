@@ -4,32 +4,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DAGraphLayeredLayoutComputer<N> {
+public class DAGraphLayeredLayoutComputer<V> {
 
-    private final DAGraph<N> graph;
+    private final DAGraph<V> graph;
 
-    public DAGraphLayeredLayoutComputer(DAGraph<N> graph) {
+    public DAGraphLayeredLayoutComputer(DAGraph<V> graph) {
         this.graph = graph;
     }
 
-    public Map<N, Integer> layout() {
+    public Map<V, Integer> layout() {
         return layoutFrom(graph.findRoots());
     }
 
-    public Map<N, Integer> layoutFrom(List<N> roots) {
-        var depths = new HashMap<N, Integer>();
-        for (N root : roots) {
+    public Map<V, Integer> layoutFrom(List<V> roots) {
+        var depths = new HashMap<V, Integer>();
+        for (V root : roots) {
             setDepth(0, root, depths);
         }
         return depths;
     }
 
-    private void setDepth(int depth, N node, Map<N, Integer> depths) {
-        var currentDepth = depths.get(node);
+    private void setDepth(int depth, V vertex, Map<V, Integer> depths) {
+        var currentDepth = depths.get(vertex);
         if (currentDepth == null || currentDepth < depth) {
-            depths.put(node, depth);
-            for (N n : graph.followers(node)) {
-                setDepth(depth + 1, n, depths);
+            depths.put(vertex, depth);
+            for (V v : graph.followers(vertex)) {
+                setDepth(depth + 1, v, depths);
             }
         }
     }

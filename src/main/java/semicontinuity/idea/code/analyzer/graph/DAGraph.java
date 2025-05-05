@@ -7,35 +7,35 @@ import java.util.function.Consumer;
 
 /**
  * Direct acyclic graph abstraction.
- * @param <N> the type of the node in the graph, must be hashable
- *           it can be just the ID of the node, with the node payload kept separately.
+ * @param <V> the type of the vertex in the graph, must be hashable
+ *            it can be just the ID of the vertex, with the node payload kept separately.
  */
-public interface DAGraph<N> {
+public interface DAGraph<V> {
 
-    void addNode(N src);
+    void addVertex(V src);
 
-    boolean hasNodes();
+    boolean hasVertices();
 
-    Set<N> nodes();
+    Set<V> vertices();
 
-    boolean containsNode(N node);
+    boolean containsVertex(V vertex);
 
-    void forEachNode(Consumer<N> consumer);
+    void forEachVertex(Consumer<V> consumer);
 
 
-    void addEdge(N src, N dst);
+    void addEdge(V src, V dst);
 
     boolean hasEdges();
 
-    int incomingEdgeCount(N node);
+    int incomingEdgeCount(V vertex);
 
-    void forEachEdge(BiConsumer<N, N> consumer);
+    void forEachEdge(BiConsumer<V, V> consumer);
 
 
-    void forEachUpstreamNode(N node, Consumer<N> consumer);
-    void forEachDownstreamNode(N node, Consumer<N> consumer);
+    void forEachUpstreamVertex(V vertex, Consumer<V> consumer);
+    void forEachDownstreamVertex(V vertex, Consumer<V> consumer);
 
-    List<N> findRoots();
+    List<V> findRoots();
 
-    Set<N> followers(N node);
+    Set<V> followers(V vertex);
 }

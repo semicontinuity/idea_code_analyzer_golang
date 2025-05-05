@@ -1,11 +1,9 @@
 package semicontinuity.idea.code.analyzer.golang.toolwindow;
 
 import java.awt.BorderLayout;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -33,7 +31,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.golang.Member;
 import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl;
@@ -175,25 +173,25 @@ public class ToolWindow implements ProjectComponent {
 
         myContentPanel.removeAll();
         var globalCallGraph = fillCallGraph(goFile);
-        var callGraphs = CallGraphSplitter.split(globalCallGraph, DAGraphImpl::new);
+        var callGraphs = CallGraphSplitter.INSTANCE.split(globalCallGraph, DAGraphImpl::new);
         ideButtonHighlightingDispatcher = new IdeButtonHighlightingDispatcher(globalCallGraph);
         myContentPanel.add(structsView(callGraphs));
     }
 
-    private JComponent structsView(Map<String, DAGraph<Node>> structGraphs) {
+    private JComponent structsView(Map<String, DAGraph<Member>> structGraphs) {
         var verticalBox = Box.createVerticalBox();
         structGraphs
                 .entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
-                .forEach((Map.Entry<String, DAGraph<Node>> e) -> verticalBox.add(
+                .forEach((Map.Entry<String, DAGraph<Member>> e) -> verticalBox.add(
                                 structView(e.getKey(), e.getValue())
                         )
                 );
         return verticalBox;
     }
 
-    private JPanel structView(String struct, DAGraph<Node> structGraph) {
+    private JPanel structView(String struct, DAGraph<Member> structGraph) {
         // just pass one viewFactory?
         var viewFactory = new IdeViewFactory(ideButtonHighlightingDispatcher);
 
@@ -219,8 +217,8 @@ public class ToolWindow implements ProjectComponent {
         return button;
     }
 
-    private static JComponent render(DAGraph<Node> graph, IdeViewFactory viewFactory) {
-        return new DAGraphViewRenderer<>(graph, viewFactory, Function.identity(), Node::getName).render();
+    private static JComponent render(DAGraph<Member> graph, IdeViewFactory viewFactory) {
+        return new DAGraphViewRenderer<>(graph, viewFactory, Function.identity(), Member::getName).render();
     }
 
     private void unregisterToolWindow() {

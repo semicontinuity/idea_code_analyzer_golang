@@ -4,28 +4,28 @@ public interface DAGraphImplTestData6 {
 
     default DAGraph<String> exampleGraph6() {
         DAGraph<String> g = new DAGraphImpl<>();
-        g.addNode("GetInstances");
-        g.addNode("GetAllInstancesByTarget");
-        g.addNode("AddDCsToRegion");
-        g.addNode("DeleteDCsFromRegion");
-        g.addNode("GetRegion");
-        g.addNode("ActivateDC");
-        g.addNode("DeactivateDC");
-        g.addNode("IsDCEnabled");
-        g.addNode("UpdateInstance");
-        g.addNode("GetConfig");
-        g.addNode("SaveConfig");
-        g.addNode("ListDeactivatedTargetsByDC");
+        g.addVertex("GetInstances");
+        g.addVertex("GetAllInstancesByTarget");
+        g.addVertex("AddDCsToRegion");
+        g.addVertex("DeleteDCsFromRegion");
+        g.addVertex("GetRegion");
+        g.addVertex("ActivateDC");
+        g.addVertex("DeactivateDC");
+        g.addVertex("IsDCEnabled");
+        g.addVertex("UpdateInstance");
+        g.addVertex("GetConfig");
+        g.addVertex("SaveConfig");
+        g.addVertex("ListDeactivatedTargetsByDC");
 
-        g.addNode("getTarget");
-        g.addNode("processGetInstancesResult");
-        g.addNode("getDisabledDatacenterTargets");
-        g.addNode("getCurrentTime");
-        g.addNode("GetAllTargets");
-        g.addNode("getDCsFromRegion");
-        g.addNode("getRegionTarget");
-        g.addNode("getTarget");
-        g.addNode("getConfigTarget");
+        g.addVertex("getTarget");
+        g.addVertex("processGetInstancesResult");
+        g.addVertex("getDisabledDatacenterTargets");
+        g.addVertex("getCurrentTime");
+        g.addVertex("GetAllTargets");
+        g.addVertex("getDCsFromRegion");
+        g.addVertex("getRegionTarget");
+        g.addVertex("getTarget");
+        g.addVertex("getConfigTarget");
 
         g.addEdge("GetInstances", "processGetInstancesResult");
         g.addEdge("GetInstances", "getTarget");

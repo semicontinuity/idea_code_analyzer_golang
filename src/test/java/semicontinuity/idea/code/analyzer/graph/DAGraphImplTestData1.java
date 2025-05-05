@@ -46,9 +46,9 @@ public interface DAGraphImplTestData1 {
         // n1
 
         DAGraph<String> g = new DAGraphImpl<>();
-        g.addNode("n0");
-        g.addNode("nX");
-        g.addNode("n1");
+        g.addVertex("n0");
+        g.addVertex("nX");
+        g.addVertex("n1");
         return g;
     }
 
@@ -69,8 +69,8 @@ public interface DAGraphImplTestData1 {
         // n21
 
         DAGraph<String> g = new DAGraphImpl<>();
-        g.addNode("n20");
-        g.addNode("n21");
+        g.addVertex("n20");
+        g.addVertex("n21");
         return g;
     }
 }

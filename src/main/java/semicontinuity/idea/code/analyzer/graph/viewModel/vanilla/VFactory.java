@@ -8,7 +8,7 @@ public class VFactory<PAYLOAD> implements Factory<
         PAYLOAD,
         VComponent,
         VIndependentComponents,
-        VNode<PAYLOAD>,
+        VMember<PAYLOAD>,
         VSplit<PAYLOAD>,
         VLayer
         > {
@@ -19,12 +19,12 @@ public class VFactory<PAYLOAD> implements Factory<
     }
 
     @Override
-    public VNode<PAYLOAD> newNode(PAYLOAD payload) {
-        return new VNode<>(payload);
+    public VMember<PAYLOAD> newVertex(PAYLOAD payload) {
+        return new VMember<>(payload);
     }
 
     @Override
-    public VSplit<PAYLOAD> newSplit(List<VNode<PAYLOAD>> items, VComponent subLayer) {
+    public VSplit<PAYLOAD> newSplit(List<VMember<PAYLOAD>> items, VComponent subLayer) {
         return new VSplit<>(items, subLayer);
     }
 

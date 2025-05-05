@@ -32,8 +32,8 @@ public interface DAGraphImplTestData3 {
         // n1
 
         DAGraph<String> g = new DAGraphImpl<>();
-        g.addNode("n0");
-        g.addNode("n1");
+        g.addVertex("n0");
+        g.addVertex("n1");
         g.addEdge("nX", "nY");
         return g;
     }
@@ -43,8 +43,8 @@ public interface DAGraphImplTestData3 {
         // n21
 
         DAGraph<String> g = new DAGraphImpl<>();
-        g.addNode("n20");
-        g.addNode("n21");
+        g.addVertex("n20");
+        g.addVertex("n21");
         return g;
     }
 }

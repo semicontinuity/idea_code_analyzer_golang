@@ -11,7 +11,7 @@ import com.goide.psi.GoFile;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import semicontinuity.idea.code.analyzer.golang.Node;
+import semicontinuity.idea.code.analyzer.golang.Member;
 import semicontinuity.idea.code.analyzer.graph.DAGraph;
 
 import static semicontinuity.idea.code.analyzer.golang.StructureFiller.fillCallGraph;
@@ -25,18 +25,22 @@ public class DumpStructCallGraph extends AnAction {
         if (goFile == null) {
             return;
         }
-        DAGraph<Node> structure = fillCallGraph(goFile);
+        DAGraph<Member> structure = fillCallGraph(goFile);
         writeDebugGraph(toDebugGraph(structure));
     }
 
-    private ArrayList<List<?>> toDebugGraph(DAGraph<Node> s) {
+    private ArrayList<List<?>> toDebugGraph(DAGraph<Member> s) {
         var out = new HashSet<List<?>>();
         s.forEachEdge((from, to) -> {
-            if (!from.getQualifier().equals(to.getQualifier())) {
-                out.add(List.of(from.getQualifier(), to.getQualifier()));
+            if (!from.getQualifier().equals(to.getQualifier()) || from.getQualifier().isEmpty() || to.getQualifier().isEmpty()) {
+                out.add(List.of(repr(from), repr(to)));
             }
         });
         return new ArrayList<>(out);
+    }
+
+    private static String repr(Member vertex) {
+        return vertex.getQualifier().isEmpty() ? vertex.getName() : vertex.getQualifier() + ":" + vertex.getName();
     }
 
     private void writeDebugGraph(ArrayList<List<?>> o) {

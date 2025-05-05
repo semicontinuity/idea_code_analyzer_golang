@@ -11,10 +11,10 @@ import semicontinuity.idea.code.analyzer.util.Context;
 
 public class StructureFiller {
 
-    public static DAGraph<Node> fillCallGraph(GoFile goFile) {
+    public static DAGraph<Member> fillCallGraph(GoFile goFile) {
         Context context = new Context();
 
-        var structure = new DAGraphImpl<Node>();
+        var structure = new DAGraphImpl<Member>();
         context.log.accept("");
         context.log.accept("");
         context.log.accept("");
@@ -30,14 +30,14 @@ public class StructureFiller {
         return structure;
     }
 
-    private static void process(PsiDirectory dir, DAGraph<Node> structure, Consumer<GoFileScanner> sink, Context context) {
+    private static void process(PsiDirectory dir, DAGraph<Member> structure, Consumer<GoFileScanner> sink, Context context) {
         if (dir == null) return;
         var files = dir.getFiles();
         for (PsiFile file : files) {
             if (file instanceof GoFile) {
                 context.log.accept("");
                 context.log.accept("  Processing file " + file.getName());
-                GoFileScanner goFileScanner = new GoFileScanner(((GoFile) file), context, structure::addNode, structure::addEdge);
+                GoFileScanner goFileScanner = new GoFileScanner(((GoFile) file), context, structure::addVertex, structure::addEdge);
                 sink.accept(goFileScanner);
             }
         }

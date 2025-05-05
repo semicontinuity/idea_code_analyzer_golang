@@ -105,11 +105,11 @@ class DAGraphDecomposerTest implements
     @NotNull
     private static DAGraphImpl<String> subgraph6_1() {
         var g = new DAGraphImpl<String>();
-        g.addNode("getTarget");
-        g.addNode("processGetInstancesResult");
-        g.addNode("getDisabledDatacenterTargets");
-        g.addNode("getCurrentTime");
-        g.addNode("GetAllTargets");
+        g.addVertex("getTarget");
+        g.addVertex("processGetInstancesResult");
+        g.addVertex("getDisabledDatacenterTargets");
+        g.addVertex("getCurrentTime");
+        g.addVertex("GetAllTargets");
 
         g.addEdge("processGetInstancesResult", "getDisabledDatacenterTargets");
         g.addEdge("processGetInstancesResult", "getCurrentTime");
@@ -119,15 +119,15 @@ class DAGraphDecomposerTest implements
     @NotNull
     private static DAGraphImpl<String> subgraph6_2() {
         var g = new DAGraphImpl<String>();
-        g.addNode("getConfigTarget");
+        g.addVertex("getConfigTarget");
         return g;
     }
 
     @NotNull
     private static DAGraphImpl<String> subgraph6_3() {
         var g = new DAGraphImpl<String>();
-        g.addNode("getDCsFromRegion");
-        g.addNode("getRegionTarget");
+        g.addVertex("getDCsFromRegion");
+        g.addVertex("getRegionTarget");
         return g;
     }
 }

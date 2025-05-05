@@ -7,38 +7,38 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class DAGraphDecomposer<N> {
+public class DAGraphDecomposer<V> {
 
-    private final DAGraph<N> graph;
-    private final Supplier<DAGraph<N>> subGraphFactory = DAGraphImpl::new;
+    private final DAGraph<V> graph;
+    private final Supplier<DAGraph<V>> subGraphFactory = DAGraphImpl::new;
 
-    public DAGraphDecomposer(DAGraph<N> graph) {
+    public DAGraphDecomposer(DAGraph<V> graph) {
         this.graph = graph;
     }
 
-    public Map<Set<N>, DAGraph<N>> decompose() {
+    public Map<Set<V>, DAGraph<V>> decompose() {
         var roots = graph.findRoots();
         System.out.println("| decompose: " + roots.size() + " roots = " + roots);
         return decomposeFrom(roots);
     }
 
-    public Map<Set<N>, DAGraph<N>> decomposeFrom(List<N> roots) {
-        // Paint every node with the 'color' of its root.
-        var colors = new HashMap<N, N>();
-        for (N root : roots) {
+    public Map<Set<V>, DAGraph<V>> decomposeFrom(List<V> roots) {
+        // Paint every vertex with the 'color' of its root.
+        var colors = new HashMap<V, V>();
+        for (V root : roots) {
             paintFrom(root, root, colors);
         }
         System.out.println("| decomposeFrom: " + roots.size() + " roots: colors=" + colors);
 
         // Traverse the graph, detecting mis-colorings:
-        // If the color of a node differs form the color of its root, then it has been re-painted from another root.
+        // If the color of a vertex differs form the color of its root, then it has been re-painted from another root.
         // It means, that sub-graphs, starting at these roots, are connected.
         // Will track this connectedness in the 'parent' hash map.
-        var parents = new HashMap<N, N>();
-        for (N root : roots) {
+        var parents = new HashMap<V, V>();
+        for (V root : roots) {
             parents.put(root, root);
         }
-        for (N root : roots) {
+        for (V root : roots) {
             checkColorFrom(root, root, colors, parents);
         }
 
@@ -47,15 +47,15 @@ public class DAGraphDecomposer<N> {
         System.out.println("| decomposeFrom...");
 
         // "Union set find"
-        var realParents = new HashMap<N, N>();
-        roots.forEach(n -> {
-            var curN = n;
+        var realParents = new HashMap<V, V>();
+        roots.forEach(v -> {
+            var curN = v;
             while (true) {
                 var parent = parents.get(curN);
                 if (parent == curN) break;
                 curN = parent;
             }
-            realParents.put(n, curN);
+            realParents.put(v, curN);
         });
 
         System.out.println("| decomposeFrom: realParents");
@@ -68,14 +68,14 @@ public class DAGraphDecomposer<N> {
 
         // Create sub-graphs for each root group
         System.out.println("| decomposeFrom " + rootGroups.size() + " rootGroups");
-        var result = new HashMap<Set<N>, DAGraph<N>>();
-        for (Set<N> rootGroup : rootGroups.values()) {
+        var result = new HashMap<Set<V>, DAGraph<V>>();
+        for (Set<V> rootGroup : rootGroups.values()) {
             System.out.println("| decomposeFrom: rootGroup=" + rootGroup);
 
             var subGraph = subGraphFactory.get();
-            for (N root : rootGroup) {
-                for (N nextNode : graph.followers(root)) {
-                    fillSubGraphFrom(nextNode, subGraph);
+            for (V root : rootGroup) {
+                for (V nextVertex : graph.followers(root)) {
+                    fillSubGraphFrom(nextVertex, subGraph);
                 }
             }
             result.put(rootGroup, subGraph);
@@ -84,30 +84,30 @@ public class DAGraphDecomposer<N> {
         return result;
     }
 
-    private void paintFrom(N node, N color, HashMap<N, N> colors) {
-        for (N nextNode : graph.followers(node)) {
-            colors.put(nextNode, color);
-            paintFrom(nextNode, color, colors);
+    private void paintFrom(V vertex, V color, HashMap<V, V> colors) {
+        for (V follower : graph.followers(vertex)) {
+            colors.put(follower, color);
+            paintFrom(follower, color, colors);
         }
     }
 
-    private void checkColorFrom(N node, N color, HashMap<N, N> colors, HashMap<N, N> parents) {
-        for (N nextNode : graph.followers(node)) {
-            var aColor = colors.get(nextNode);
-            System.out.println("  | " + node + "[color:" + color + "] ->" + nextNode + "[color: " + aColor + "]");
+    private void checkColorFrom(V vertex, V color, HashMap<V, V> colors, HashMap<V, V> parents) {
+        for (V follower : graph.followers(vertex)) {
+            var aColor = colors.get(follower);
+            System.out.println("  | " + vertex + "[color:" + color + "] ->" + follower + "[color: " + aColor + "]");
             if (!color.equals(aColor)) {
                 parents.put(color, aColor);
 //                parents.put(aColor, color);
             }
-            checkColorFrom(nextNode, color, colors, parents);
+            checkColorFrom(follower, color, colors, parents);
         }
     }
 
-    void fillSubGraphFrom(N node, DAGraph<N> sink) {
-        sink.addNode(node);
-        for (N nextNode : graph.followers(node)) {
-            sink.addEdge(node, nextNode);
-            fillSubGraphFrom(nextNode, sink);
+    void fillSubGraphFrom(V vertex, DAGraph<V> sink) {
+        sink.addVertex(vertex);
+        for (V follower : graph.followers(vertex)) {
+            sink.addEdge(vertex, follower);
+            fillSubGraphFrom(follower, sink);
         }
     }
 }
