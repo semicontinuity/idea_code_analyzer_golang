@@ -1,6 +1,7 @@
 package semicontinuity.idea.code.analyzer.graph;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,20 +87,26 @@ public class DAGraphDecomposer<V> {
 
     private void paintFrom(V vertex, V color, HashMap<V, V> colors) {
         for (V follower : graph.followers(vertex)) {
-            colors.put(follower, color);
-            paintFrom(follower, color, colors);
+            if (colors.putIfAbsent(follower, color) == null) {
+                paintFrom(follower, color, colors);
+            }
         }
     }
 
     private void checkColorFrom(V vertex, V color, HashMap<V, V> colors, HashMap<V, V> parents) {
+        doCheckColorFrom(vertex, color, colors, parents, new HashSet<>());
+    }
+
+    private void doCheckColorFrom(V vertex, V color, HashMap<V, V> colors, HashMap<V, V> parents, Set<V> visited) {
         for (V follower : graph.followers(vertex)) {
+            if (visited.contains(follower)) continue;
+
             var aColor = colors.get(follower);
             System.out.println("  | " + vertex + "[color:" + color + "] ->" + follower + "[color: " + aColor + "]");
             if (!color.equals(aColor)) {
                 parents.put(color, aColor);
-//                parents.put(aColor, color);
             }
-            checkColorFrom(follower, color, colors, parents);
+            doCheckColorFrom(follower, color, colors, parents, visited);
         }
     }
 
