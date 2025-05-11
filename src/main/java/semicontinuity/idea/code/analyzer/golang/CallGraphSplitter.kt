@@ -1,33 +1,52 @@
 package semicontinuity.idea.code.analyzer.golang
 
 import semicontinuity.idea.code.analyzer.graph.DAGraph
+import semicontinuity.idea.code.analyzer.graph.DAGraphImpl
 import java.util.function.Supplier
 
 /**
  * Splits call graph into several sub-graphs, one per struct.
  */
 object CallGraphSplitter {
+    
+    data class Split(
+        val coarseGraph: DAGraph<String>,
+        val subGraphs: Map<String, DAGraph<Member>>,
+        val simpleVertices: Map<String, Member>,
+    )
 
-    fun split(graph: DAGraph<Member>, subGraphFactory: Supplier<DAGraph<Member>>): Map<String, DAGraph<Member>> {
+    fun split(graph: DAGraph<Member>, subGraphFactory: Supplier<DAGraph<Member>>): Split {
+        val coarseGraph: DAGraph<String> = DAGraphImpl()
         val subGraphs = HashMap<String, DAGraph<Member>>()
+        val simpleVertices = HashMap<String, Member>()
 
         graph.forEachVertex { m: Member ->
-            subGraphs.computeIfAbsent(group(m)) { k: String? -> subGraphFactory.get() }.addVertex(m)
-        }
-
-        graph.forEachEdge { m1: Member, m2: Member ->
-            if (inSameSubgraph(m1, m2)) {
-                subGraphs[group(m1)]?.addEdge(m1, m2)
+            if (isComplex(m)) {
+                subGraphs.computeIfAbsent(coarseGraphId(m)) { subGraphFactory.get() }.addVertex(m)
+            } else {
+                simpleVertices.put(m.name, m)
             }
         }
 
-        return subGraphs
+        graph.forEachEdge { m1: Member, m2: Member ->
+            val coarseGraphId1 = coarseGraphId(m1)
+            val coarseGraphId2 = coarseGraphId(m2)
+            if (coarseGraphId1 != coarseGraphId2) {
+                coarseGraph.addEdge(coarseGraphId1, coarseGraphId2)
+            }
+
+            if (inSameSubgraph(m1, m2)) {
+                subGraphs[coarseGraphId(m1)]?.addEdge(m1, m2)
+            }
+        }
+
+        return Split(coarseGraph, subGraphs, simpleVertices)
     }
 
     private fun inSameSubgraph(n1: Member, n2: Member) =
-        n1.qualifier.isNotEmpty()
-            && n2.qualifier.isNotEmpty()
-            && n1.qualifier == n2.qualifier
+        isComplex(n1) && isComplex(n2) && n1.qualifier == n2.qualifier
 
-    private fun group(m: Member): String = m.qualifier
+    private fun coarseGraphId(m: Member): String = if (isComplex(m)) m.qualifier else m.name
+
+    private fun isComplex(m: Member) = m.qualifier.isNotEmpty()
 }
