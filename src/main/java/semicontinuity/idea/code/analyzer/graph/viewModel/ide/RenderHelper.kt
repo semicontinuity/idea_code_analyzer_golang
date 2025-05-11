@@ -33,6 +33,16 @@ object RenderHelper {
             add(
                 Box.createHorizontalBox().apply {
                     add(structButton(struct))
+                    // add(
+                    //     ideButton(
+                    //
+                    //     ).apply {
+                    //         horizontalAlignment = SwingConstants.LEFT
+                    //         maximumSize = Dimension(Int.MAX_VALUE, getPreferredSize().height)
+                    //         foreground = UIUtil.getToolTipBackground()
+                    //         background = UIUtil.getToolTipForeground()
+                    //     }
+                    // )
                 }
             )
 
@@ -47,13 +57,12 @@ object RenderHelper {
 
     private fun structButton(struct: String) =
         JButton(struct).apply {
+            setUI(BasicButtonUI())
+            horizontalAlignment = SwingConstants.LEFT
             maximumSize = Dimension(Int.MAX_VALUE, getPreferredSize().height)
-            setHorizontalAlignment(SwingConstants.LEFT);
             foreground = UIUtil.getToolTipBackground()
             background = UIUtil.getToolTipForeground()
             border = BorderFactory.createEmptyBorder()
-            setUI(BasicButtonUI())
-            horizontalAlignment = SwingConstants.LEFT
         }
 
     private fun render(graph: DAGraph<Member>, viewFactory: MembersGraphViewFactory) =

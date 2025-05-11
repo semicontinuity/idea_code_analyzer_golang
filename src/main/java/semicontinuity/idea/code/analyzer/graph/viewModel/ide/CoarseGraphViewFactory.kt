@@ -12,16 +12,16 @@ class CoarseGraphViewFactory(
 ) : BaseIdeGraphViewFactory<String>() {
 
     override fun newVertex(vertex: String): JComponent {
+        val subGraph = subGraphs[vertex]
         val member = simpleVertices[vertex]
-        return if (member != null) {
-            subGraphViewFactory.newVertex(member)
-        } else {
-            val subGraph = subGraphs[vertex]
-            if (subGraph == null) {
-                JButton(vertex)
+        return if (subGraph == null) {
+            if (member != null) {
+                subGraphViewFactory.newVertex(member)
             } else {
-                RenderHelper.structView(vertex, subGraph, subGraphViewFactory)
+                JButton(vertex)
             }
+        } else {
+            RenderHelper.structView(vertex, subGraph, subGraphViewFactory)
         }
     }
 }
