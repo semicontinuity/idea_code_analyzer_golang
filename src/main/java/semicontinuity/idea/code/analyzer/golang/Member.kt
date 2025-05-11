@@ -1,60 +1,38 @@
-package semicontinuity.idea.code.analyzer.golang;
+package semicontinuity.idea.code.analyzer.golang
 
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElement
 
-public class Member {
-    private final String qualifier;
-    private final String name;
-    private final PsiElement psiElement;
-
-    public Member(String qualifier, String name, PsiElement psiElement) {
-        this.qualifier = qualifier;
-        this.name = name;
-        this.psiElement = psiElement;
+// qualifier == "" && name != ""   => function
+// qualifier != "" && name != ""   => method
+// qualifier != "" && name == ""   => struct
+class Member(@JvmField val qualifier: String, @JvmField val name: String, val psiElement: PsiElement) {
+    override fun toString(): String {
+        return if (qualifier.isEmpty()) name else "$qualifier.$name"
     }
 
-    public String getQualifier() {
-        return qualifier;
+    fun toQualifiedName(): QualifiedName {
+        return QualifiedName(qualifier, name)
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public PsiElement getPsiElement() {
-        return psiElement;
-    }
-
-    @Override
-    public String toString() {
-        return qualifier.isEmpty() ? name : qualifier + '.' + name;
-    }
-
-    public QualifiedName toQualifiedName() {
-        return new QualifiedName(qualifier, name);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun equals(o: Any?): Boolean {
+        if (this === o) {
+            return true
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (o == null || javaClass != o.javaClass) {
+            return false
         }
 
-        Member that = (Member) o;
+        val that = o as Member
 
-        if (!qualifier.equals(that.qualifier)) {
-            return false;
+        if (qualifier != that.qualifier) {
+            return false
         }
-        return name.equals(that.name);
+        return name == that.name
     }
 
-    @Override
-    public int hashCode() {
-        int result = qualifier.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
+    override fun hashCode(): Int {
+        var result = qualifier.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
     }
 }

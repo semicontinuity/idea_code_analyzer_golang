@@ -10,22 +10,22 @@ import java.util.function.Supplier
 object CallGraphSplitter {
     
     data class Split(
+        // replace with DAGraph<Member>
         val coarseGraph: DAGraph<String>,
         val subGraphs: Map<String, DAGraph<Member>>,
-        val simpleVertices: Map<String, Member>,
+        val members: Map<String, Member>,
     )
 
     fun split(graph: DAGraph<Member>, subGraphFactory: Supplier<DAGraph<Member>>): Split {
         val coarseGraph: DAGraph<String> = DAGraphImpl()
         val subGraphs = HashMap<String, DAGraph<Member>>()
-        val simpleVertices = HashMap<String, Member>()
+        val members = HashMap<String, Member>()
 
         graph.forEachVertex { m: Member ->
+            members[coarseGraphId(m)] = m
             coarseGraph.addVertex(coarseGraphId(m))
             if (isComplex(m) && m.name != "") {
                 subGraphs.computeIfAbsent(coarseGraphId(m)) { subGraphFactory.get() }.addVertex(m)
-            } else {
-                simpleVertices[m.name] = m
             }
         }
 
@@ -41,7 +41,7 @@ object CallGraphSplitter {
             }
         }
 
-        return Split(coarseGraph, subGraphs, simpleVertices)
+        return Split(coarseGraph, subGraphs, members)
     }
 
     private fun inSameSubgraph(n1: Member, n2: Member) =

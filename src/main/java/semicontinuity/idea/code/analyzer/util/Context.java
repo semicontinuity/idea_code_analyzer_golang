@@ -16,6 +16,6 @@ public class Context implements Closeable {
 
 
     public void logEdge(Member from, Member to) {
-        log.accept("        EDGE " + from.getQualifier() + '.' + from.getName() + " -> " + to.getQualifier() + "." + to.getName());
+        log.accept("        EDGE " + from.qualifier + '.' + from.name + " -> " + to.qualifier + "." + to.name);
     }
 }

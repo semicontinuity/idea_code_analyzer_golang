@@ -32,7 +32,7 @@ public class DumpStructCallGraph extends AnAction {
     private ArrayList<List<?>> toDebugGraph(DAGraph<Member> s) {
         var out = new HashSet<List<?>>();
         s.forEachEdge((from, to) -> {
-            if (!from.getQualifier().equals(to.getQualifier()) || from.getQualifier().isEmpty() || to.getQualifier().isEmpty()) {
+            if (!from.qualifier.equals(to.qualifier) || from.qualifier.isEmpty() || to.qualifier.isEmpty()) {
                 out.add(List.of(repr(from), repr(to)));
             }
         });
@@ -40,7 +40,7 @@ public class DumpStructCallGraph extends AnAction {
     }
 
     private static String repr(Member vertex) {
-        return vertex.getQualifier().isEmpty() ? vertex.getName() : vertex.getQualifier() + ":" + vertex.getName();
+        return vertex.qualifier.isEmpty() ? vertex.name : vertex.qualifier + ":" + vertex.name;
     }
 
     private void writeDebugGraph(ArrayList<List<?>> o) {

@@ -42,7 +42,7 @@ class IdeButtonHighlightingDispatcher(private val callGraph: DAGraph<Member>) :
     fun vertex(psiElement: PsiElement): Member? {
         val function = psiElement.parentOfType<GoFunctionDeclaration>()
         if (function != null) {
-            return Member("", function.name, psiElement)
+            return Member("", function.name!!, psiElement)
         }
 
         val method = psiElement.parentOfType<GoMethodDeclaration>()
@@ -51,7 +51,7 @@ class IdeButtonHighlightingDispatcher(private val callGraph: DAGraph<Member>) :
             if (receiver != null) {
                 return Member(
                     typeName(receiver),
-                    method.name,
+                    method.name!!,
                     psiElement
                 )
             }

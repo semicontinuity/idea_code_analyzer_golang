@@ -156,7 +156,7 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
 
     private fun coarseGraphView(split: CallGraphSplitter.Split): JComponent {
         val coarseGraphViewFactory = CoarseGraphViewFactory(
-            split.simpleVertices, split.subGraphs, subGraphViewFactory!!,
+            split.members, split.subGraphs, subGraphViewFactory!!, ideButtonHighlightingDispatcher!!
         )
 
         val content = DAGraphViewRenderer(

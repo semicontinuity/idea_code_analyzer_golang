@@ -190,7 +190,7 @@ public class GoFileScanner {
                 String packageName = ((GoFile) containingFile).getPackageName();
                 if (Objects.equals(packageName, goFile.getPackageName())) {
                     System.out.println("Referring type from the same package");
-                    if (!Objects.equals(from.getQualifier(), structName)) {
+                    if (!Objects.equals(from.qualifier, structName)) {
                         edgeSink.accept(from, new Member(structName, "", goType));
                     }
                 }

@@ -15,17 +15,25 @@ import javax.swing.plaf.basic.BasicButtonUI
 
 object RenderHelper {
 
-    fun structView(struct: String, structGraph: DAGraph<Member>, subGraphViewFactory: MembersGraphViewFactory?) =
+    fun structView(
+        member: Member,
+        struct: String,
+        structGraph: DAGraph<Member>,
+        subGraphViewFactory: MembersGraphViewFactory?,
+        ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher
+    ) =
         Box.createVerticalBox().apply {
             add(Box.createVerticalGlue())
-            add(structViewContents(struct, structGraph, subGraphViewFactory))
+            add(structViewContents(member, struct, structGraph, subGraphViewFactory, ideButtonHighlightingDispatcher))
             add(Box.createVerticalGlue())
         }
 
     private fun structViewContents(
+        member: Member,
         struct: String,
         structGraph: DAGraph<Member>,
-        subGraphViewFactory: MembersGraphViewFactory?
+        subGraphViewFactory: MembersGraphViewFactory?,
+        ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher,
     ) =
         Box.createVerticalBox().apply {
             add(Box.createVerticalGlue())
@@ -33,16 +41,20 @@ object RenderHelper {
             add(
                 Box.createHorizontalBox().apply {
                     add(structButton(struct))
-                    // add(
-                    //     ideButton(
-                    //
-                    //     ).apply {
-                    //         horizontalAlignment = SwingConstants.LEFT
-                    //         maximumSize = Dimension(Int.MAX_VALUE, getPreferredSize().height)
-                    //         foreground = UIUtil.getToolTipBackground()
-                    //         background = UIUtil.getToolTipForeground()
-                    //     }
-                    // )
+/*
+                    add(
+                        ideButton(
+                            member,
+                            ideButtonHighlightingDispatcher,
+                            null,
+                        ).apply {
+                            horizontalAlignment = SwingConstants.LEFT
+                            maximumSize = Dimension(Int.MAX_VALUE, getPreferredSize().height)
+                            foreground = UIUtil.getToolTipBackground()
+                            background = UIUtil.getToolTipForeground()
+                        }
+                    )
+*/
                 }
             )
 
