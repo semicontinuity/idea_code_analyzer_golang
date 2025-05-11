@@ -11,8 +11,9 @@ open class MembersGraphViewFactory(private val ideButtonHighlightingDispatcher: 
     BaseIdeGraphViewFactory<Member>() {
 
     override fun newVertex(vertex: Member) =
-        JPanel(BorderLayout()).apply {
-            add(ideButton(vertex), BorderLayout.WEST)
+        Box.createHorizontalBox().apply {
+            add(ideButton(vertex))
+            add(Box.createHorizontalGlue())
         }
 
     private fun ideButton(vertex: Member) = IdeButton(

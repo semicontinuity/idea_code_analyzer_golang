@@ -19,28 +19,26 @@ abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
             box.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
         }
 
+        box.add(Box.createVerticalGlue())
         for (component in components) {
             box.add(component)
         }
+        box.add(Box.createVerticalGlue())
         return box
     }
 
     override fun newSplit(items: List<JComponent>, subLayer: JComponent) =
-        JPanel(BorderLayout()).apply {
+        Box.createHorizontalBox().apply {
+            add(itemsBox(items))
+            add(Box.createHorizontalStrut(4))
+            add(subLayer)
+            add(Box.createHorizontalGlue())
+
             border = if (showDebugBorders) {
                 BorderFactory.createLineBorder(Color.YELLOW)
             } else {
                 BorderFactory.createEmptyBorder(1, 1, 1, 1)
             }
-
-            add(
-                Box.createHorizontalBox().apply {
-                    add(itemsBox(items))
-                    add(Box.createHorizontalStrut(4))
-                    add(subLayer)
-                    add(Box.createGlue())
-                }
-            )
         }
 
     override fun newLayer(directDeps: JComponent?, sharedDeps: JComponent?): JComponent {
@@ -51,12 +49,17 @@ abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
             box.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
         }
 
+        box.add(Box.createVerticalGlue())
+
         if (directDeps != null) {
             box.add(directDepsBox(directDeps))
         }
         if (sharedDeps != null) {
             box.add(sharedDepsBox(sharedDeps))
         }
+
+        box.add(Box.createVerticalGlue())
+
         return box
     }
 
@@ -68,33 +71,40 @@ abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
             box.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
         }
 
+        box.add(Box.createVerticalGlue())
         for (component in items) {
             box.add(component)
         }
+        box.add(Box.createVerticalGlue())
         return box
     }
 
     fun directDepsBox(contents: JComponent?): JComponent {
         val box = Box.createVerticalBox()
+
         if (showDebugBorders) {
             box.border = BorderFactory.createLineBorder(Color.GREEN)
         } else {
             box.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
         }
 
+        box.add(Box.createVerticalGlue())
         box.add(contents)
+        box.add(Box.createVerticalGlue())
         return box
     }
 
     fun sharedDepsBox(contents: JComponent?): JComponent {
         val box = Box.createVerticalBox()
-        if (showDebugBorders) {
+        // if (showDebugBorders) {
             box.border = BorderFactory.createLineBorder(Color.RED)
-        } else {
-            box.border = BorderFactory.createLoweredBevelBorder()
-        }
+        // } else {
+        //     box.border = BorderFactory.createLoweredBevelBorder()
+        // }
 
+        box.add(Box.createVerticalGlue())
         box.add(contents)
+        box.add(Box.createVerticalGlue())
         return box
     }
 

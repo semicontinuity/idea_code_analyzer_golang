@@ -4,45 +4,57 @@ import com.intellij.util.ui.UIUtil
 import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
-import java.awt.BorderLayout
 import java.util.function.Function
 import javax.swing.BorderFactory
+import javax.swing.Box
 import javax.swing.JButton
-import javax.swing.JComponent
-import javax.swing.JPanel
 import javax.swing.SwingConstants
 import javax.swing.plaf.basic.BasicButtonUI
 
 object RenderHelper {
 
-    fun structView(struct: String, structGraph: DAGraph<Member>, subGraphViewFactory: MembersGraphViewFactory?): JPanel {
-        val structView = JPanel()
-        structView.layout = BorderLayout()
+    fun structView(struct: String, structGraph: DAGraph<Member>, subGraphViewFactory: MembersGraphViewFactory?) =
+        Box.createVerticalBox().apply {
+            add(Box.createVerticalGlue())
+            add(structViewContents(struct, structGraph, subGraphViewFactory))
+            add(Box.createVerticalGlue())
+        }
 
-        structView.border = BorderFactory.createRaisedBevelBorder()
+    private fun structViewContents(
+        struct: String,
+        structGraph: DAGraph<Member>,
+        subGraphViewFactory: MembersGraphViewFactory?
+    ) =
+        Box.createVerticalBox().apply {
+            add(Box.createVerticalGlue())
 
-        structView.add(structButton(struct), BorderLayout.NORTH)
+            add(
+                Box.createHorizontalBox().apply {
+                    add(structButton(struct))
+                    add(Box.createHorizontalGlue())
+                }
+            )
 
-        val contents = render(structGraph, subGraphViewFactory!!)
-        contents.border = BorderFactory.createLoweredBevelBorder()
-        structView.add(contents, BorderLayout.CENTER)
+            add(
+                render(structGraph, subGraphViewFactory!!).apply {
+                    border = BorderFactory.createLoweredBevelBorder()
+                },
+            )
 
-        return structView
-    }
+            add(Box.createVerticalGlue())
+        }
 
-    private fun structButton(struct: String): JButton {
-        val button = JButton(struct)
-        button.foreground = UIUtil.getToolTipBackground()
-        button.background = UIUtil.getToolTipForeground()
-        button.border = BorderFactory.createEmptyBorder()
-        button.setUI(BasicButtonUI())
-        button.horizontalAlignment = SwingConstants.LEFT
-        return button
-    }
+    private fun structButton(struct: String) =
+        JButton(struct).apply {
+            foreground = UIUtil.getToolTipBackground()
+            background = UIUtil.getToolTipForeground()
+            border = BorderFactory.createEmptyBorder()
+            setUI(BasicButtonUI())
+            horizontalAlignment = SwingConstants.LEFT
+        }
 
-    private fun render(graph: DAGraph<Member>, viewFactory: MembersGraphViewFactory): JComponent {
-        return DAGraphViewRenderer(
+    private fun render(graph: DAGraph<Member>, viewFactory: MembersGraphViewFactory) =
+        DAGraphViewRenderer(
             graph, viewFactory, Function.identity()
         ) { obj: Member -> obj.name }.render()
-    }
 }
