@@ -1,6 +1,7 @@
 package semicontinuity.idea.code.analyzer.golang;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -17,12 +18,15 @@ import com.goide.psi.GoRecursiveVisitor;
 import com.goide.psi.GoRecvStatement;
 import com.goide.psi.GoReferenceExpression;
 import com.goide.psi.GoShortVarDeclaration;
+import com.goide.psi.GoStatement;
 import com.goide.psi.GoType;
+import com.goide.psi.GoTypeReferenceExpression;
 import com.goide.psi.GoTypeSpec;
 import com.goide.psi.GoUnaryExpr;
 import com.goide.psi.GoVarDefinition;
 import com.goide.psi.GoVarSpec;
 import com.intellij.pom.PomTargetPsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.jetbrains.annotations.NotNull;
@@ -168,7 +172,28 @@ public class GoFileScanner {
                 super.visitBuiltinCallExpr(expr);
                 System.out.println("      BuiltinCallExpr = " + expr);
             }
+
+            @Override
+            public void visitTypeReferenceExpression(@NotNull GoTypeReferenceExpression o) {
+                super.visitTypeReferenceExpression(o);
+                processTypeReferenceExpression(o);
+            }
         };
+    }
+
+    private void processTypeReferenceExpression(@NotNull GoTypeReferenceExpression expr) {
+        GoType goType = expr.resolveType(null);
+        System.out.println("goType = " + goType);
+        if (goType != null) {
+            String text = goType.getText();
+            PsiFile containingFile = goType.getContainingFile();
+            if (containingFile instanceof GoFile) {
+                String packageName = ((GoFile) containingFile).getPackageName();
+                if (Objects.equals(packageName, goFile.getPackageName())) {
+                    System.out.println("Referring type from the same package " + text);
+                }
+            }
+        }
     }
 
     private void processCallExpr(@NotNull GoCallExpr callExpr, Member from) {
