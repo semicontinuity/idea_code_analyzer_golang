@@ -22,7 +22,7 @@ object CallGraphSplitter {
 
         graph.forEachVertex { m: Member ->
             coarseGraph.addVertex(coarseGraphId(m))
-            if (isComplex(m)) {
+            if (isComplex(m) && m.name != "") {
                 subGraphs.computeIfAbsent(coarseGraphId(m)) { subGraphFactory.get() }.addVertex(m)
             } else {
                 simpleVertices[m.name] = m
@@ -36,7 +36,7 @@ object CallGraphSplitter {
                 coarseGraph.addEdge(coarseGraphId1, coarseGraphId2)
             }
 
-            if (inSameSubgraph(m1, m2)) {
+            if (inSameSubgraph(m1, m2) && m2.name != "") {
                 subGraphs[coarseGraphId(m1)]?.addEdge(m1, m2)
             }
         }

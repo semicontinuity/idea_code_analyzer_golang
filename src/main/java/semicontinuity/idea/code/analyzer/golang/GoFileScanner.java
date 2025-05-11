@@ -18,7 +18,6 @@ import com.goide.psi.GoRecursiveVisitor;
 import com.goide.psi.GoRecvStatement;
 import com.goide.psi.GoReferenceExpression;
 import com.goide.psi.GoShortVarDeclaration;
-import com.goide.psi.GoStatement;
 import com.goide.psi.GoType;
 import com.goide.psi.GoTypeReferenceExpression;
 import com.goide.psi.GoTypeSpec;
@@ -176,21 +175,24 @@ public class GoFileScanner {
             @Override
             public void visitTypeReferenceExpression(@NotNull GoTypeReferenceExpression o) {
                 super.visitTypeReferenceExpression(o);
-                processTypeReferenceExpression(o);
+                processTypeReferenceExpression(o, from);
             }
         };
     }
 
-    private void processTypeReferenceExpression(@NotNull GoTypeReferenceExpression expr) {
+    private void processTypeReferenceExpression(@NotNull GoTypeReferenceExpression expr, Member from) {
+        String structName = expr.getText();
         GoType goType = expr.resolveType(null);
         System.out.println("goType = " + goType);
         if (goType != null) {
-            String text = goType.getText();
             PsiFile containingFile = goType.getContainingFile();
             if (containingFile instanceof GoFile) {
                 String packageName = ((GoFile) containingFile).getPackageName();
                 if (Objects.equals(packageName, goFile.getPackageName())) {
-                    System.out.println("Referring type from the same package " + text);
+                    System.out.println("Referring type from the same package");
+                    if (!Objects.equals(from.getQualifier(), structName)) {
+                        edgeSink.accept(from, new Member(structName, "", goType));
+                    }
                 }
             }
         }
