@@ -1,37 +1,25 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
 import semicontinuity.idea.code.analyzer.golang.Member
-import java.awt.BorderLayout
+import semicontinuity.idea.code.analyzer.graph.viewModel.ide.RenderHelper.icon
+import semicontinuity.idea.code.analyzer.graph.viewModel.ide.RenderHelper.ideButton
 import javax.swing.Box
 import javax.swing.ImageIcon
-import javax.swing.JComponent
-import javax.swing.JPanel
 
 open class MembersGraphViewFactory(private val ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher) :
     BaseIdeGraphViewFactory<Member>() {
 
     override fun newVertex(vertex: Member) =
         Box.createHorizontalBox().apply {
-            add(ideButton(vertex))
+            add(methodButton(vertex))
             add(Box.createHorizontalGlue())
         }
 
-    private fun ideButton(vertex: Member) = IdeButton(
-        vertex.psiElement,
-        vertex.name,
-        methodIcon,
+    private fun methodButton(vertex: Member) = ideButton(
         vertex,
-        ideButtonHighlightingDispatcher
-    ).also {
-        ideButtonHighlightingDispatcher.register(vertex, it)
-    }
+        ideButtonHighlightingDispatcher,
+        methodIcon
+    )
 
-    companion object {
-        var methodIcon: ImageIcon? = icon("/icons/method.png")
-
-        protected fun icon(iconResource: String): ImageIcon? {
-            val resource = IdeButton::class.java.getResource(iconResource) ?: return null
-            return ImageIcon(resource)
-        }
-    }
+    private val methodIcon: ImageIcon? = icon("/icons/method.png")
 }

@@ -8,6 +8,7 @@ import java.awt.Dimension
 import java.util.function.Function
 import javax.swing.BorderFactory
 import javax.swing.Box
+import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.SwingConstants
 import javax.swing.plaf.basic.BasicButtonUI
@@ -59,4 +60,21 @@ object RenderHelper {
         DAGraphViewRenderer(
             graph, viewFactory, Function.identity()
         ) { obj: Member -> obj.name }.render()
+
+    fun ideButton(
+        vertex: Member, ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher, icon: ImageIcon?
+    ) = IdeButton(
+        vertex.psiElement,
+        vertex.name,
+        icon,
+        vertex,
+        ideButtonHighlightingDispatcher
+    ).also {
+        ideButtonHighlightingDispatcher.register(vertex, it)
+    }
+
+    fun icon(iconResource: String): ImageIcon? {
+        val resource = IdeButton::class.java.getResource(iconResource) ?: return null
+        return ImageIcon(resource)
+    }
 }
