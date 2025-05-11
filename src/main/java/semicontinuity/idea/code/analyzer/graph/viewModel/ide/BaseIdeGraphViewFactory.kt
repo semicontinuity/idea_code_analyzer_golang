@@ -1,10 +1,12 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
 import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
+import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.JComponent
+import javax.swing.JPanel
 
 abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
     Factory<VERTEX_PAYLOAD, JComponent, JComponent, JComponent, JComponent, JComponent> {
@@ -23,20 +25,23 @@ abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
         return box
     }
 
-    override fun newSplit(items: List<JComponent>, subLayer: JComponent): JComponent {
-        val box = Box.createHorizontalBox()
-        if (showDebugBorders) {
-            box.border = BorderFactory.createLineBorder(Color.YELLOW)
-        } else {
-            box.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
-        }
+    override fun newSplit(items: List<JComponent>, subLayer: JComponent) =
+        JPanel(BorderLayout()).apply {
+            border = if (showDebugBorders) {
+                BorderFactory.createLineBorder(Color.YELLOW)
+            } else {
+                BorderFactory.createEmptyBorder(1, 1, 1, 1)
+            }
 
-        box.add(itemsBox(items))
-        box.add(subLayer)
-        box.add(Box.createHorizontalStrut(20))
-        box.add(Box.createGlue())
-        return box
-    }
+            add(
+                Box.createHorizontalBox().apply {
+                    add(itemsBox(items))
+                    add(Box.createHorizontalStrut(4))
+                    add(subLayer)
+                    add(Box.createGlue())
+                }
+            )
+        }
 
     override fun newLayer(directDeps: JComponent?, sharedDeps: JComponent?): JComponent {
         val box = Box.createVerticalBox()

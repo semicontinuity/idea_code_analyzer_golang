@@ -21,10 +21,11 @@ object CallGraphSplitter {
         val simpleVertices = HashMap<String, Member>()
 
         graph.forEachVertex { m: Member ->
+            coarseGraph.addVertex(coarseGraphId(m))
             if (isComplex(m)) {
                 subGraphs.computeIfAbsent(coarseGraphId(m)) { subGraphFactory.get() }.addVertex(m)
             } else {
-                simpleVertices.put(m.name, m)
+                simpleVertices[m.name] = m
             }
         }
 
