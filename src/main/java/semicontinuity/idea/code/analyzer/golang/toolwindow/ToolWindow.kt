@@ -13,15 +13,12 @@ import com.intellij.util.ui.UIUtil
 import org.apache.log4j.Logger
 import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter
 import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter.split
-import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.golang.StructureFiller
-import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.CoarseGraphViewFactory
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeButtonHighlightingDispatcher
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.MembersGraphViewFactory
-import semicontinuity.idea.code.analyzer.graph.viewModel.ide.RenderHelper
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.util.Objects
@@ -117,7 +114,7 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
     private fun myContentPanel(): JPanel {
         val myContentPanel = JPanel()
         myContentPanel.layout = BorderLayout()
-        myContentPanel.background = UIUtil.getTreeTextBackground()
+        myContentPanel.background = UIUtil.getTreeBackground()
         this.myContentPanel = myContentPanel
         return myContentPanel
     }
@@ -145,10 +142,16 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
 
         myContentPanel!!.removeAll()
         val globalCallGraph = StructureFiller.fillCallGraph(goFile)
-        ideButtonHighlightingDispatcher = IdeButtonHighlightingDispatcher(globalCallGraph)
-        subGraphViewFactory = MembersGraphViewFactory(ideButtonHighlightingDispatcher)
+        val dispatcher = IdeButtonHighlightingDispatcher(globalCallGraph)
+        ideButtonHighlightingDispatcher = dispatcher
+        subGraphViewFactory = MembersGraphViewFactory(dispatcher)
         val split = split(globalCallGraph, { DAGraphImpl() })
-        myContentPanel!!.add(coarseGraphView(split), BorderLayout.NORTH)
+        myContentPanel!!.add(
+            JPanel(BorderLayout()).apply {
+                add(coarseGraphView(split), BorderLayout.WEST)
+            },
+            BorderLayout.NORTH
+        )
     }
 
     private fun coarseGraphView(split: CallGraphSplitter.Split): JComponent {

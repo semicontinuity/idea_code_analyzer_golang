@@ -1,5 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
+import com.intellij.util.ui.UIUtil
 import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
@@ -31,13 +32,15 @@ object RenderHelper {
 
     private fun structButton(struct: String): JButton {
         val button = JButton(struct)
+        button.foreground = UIUtil.getToolTipBackground()
+        button.background = UIUtil.getToolTipForeground()
         button.border = BorderFactory.createEmptyBorder()
         button.setUI(BasicButtonUI())
         button.horizontalAlignment = SwingConstants.LEFT
         return button
     }
 
-    fun render(graph: DAGraph<Member>, viewFactory: MembersGraphViewFactory): JComponent {
+    private fun render(graph: DAGraph<Member>, viewFactory: MembersGraphViewFactory): JComponent {
         return DAGraphViewRenderer(
             graph, viewFactory, Function.identity()
         ) { obj: Member -> obj.name }.render()

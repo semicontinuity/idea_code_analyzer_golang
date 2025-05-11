@@ -1,45 +1,37 @@
-package semicontinuity.idea.code.analyzer.graph.viewModel.ide;
+package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
-import java.net.URL;
+import semicontinuity.idea.code.analyzer.golang.Member
+import javax.swing.Box
+import javax.swing.ImageIcon
+import javax.swing.JComponent
 
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
+open class MembersGraphViewFactory(private val ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher) :
+    BaseIdeGraphViewFactory<Member>() {
 
-import semicontinuity.idea.code.analyzer.golang.Member;
+    override fun newVertex(vertex: Member): JComponent {
+        val box = Box.createHorizontalBox()
+        val ideButton = IdeButton(
+            vertex.psiElement,
+            vertex.name,
+            methodIcon,
+            vertex,
+            ideButtonHighlightingDispatcher
+        )
+        ideButtonHighlightingDispatcher.register(vertex, ideButton)
 
-public class MembersGraphViewFactory extends BaseIdeGraphViewFactory<Member> {
-    static ImageIcon methodIcon = icon("/icons/method.png");
-
-    private final IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher;
-
-    public MembersGraphViewFactory(IdeButtonHighlightingDispatcher ideButtonHighlightingDispatcher) {
-        this.ideButtonHighlightingDispatcher = ideButtonHighlightingDispatcher;
+        box.add(ideButton)
+        // box.add(Box.createHorizontalGlue())
+        // box.add(Box.createHorizontalGlue())
+        box.add(Box.createHorizontalStrut(10))
+        return box
     }
 
-    @Override
-    public JComponent newVertex(Member vertex) {
-        var box = Box.createHorizontalBox();
-        var ideButton = new IdeButton(
-                vertex.getPsiElement(),
-                vertex.getName(),
-                methodIcon,
-                vertex,
-                ideButtonHighlightingDispatcher
-        );
-        ideButtonHighlightingDispatcher.register(vertex, ideButton);
+    companion object {
+        var methodIcon: ImageIcon? = icon("/icons/method.png")
 
-        box.add(ideButton);
-        box.add(Box.createHorizontalGlue());
-        box.add(Box.createHorizontalGlue());
-        return box;
-    }
-
-    protected static ImageIcon icon(final String iconResource) {
-        final URL resource = IdeButton.class.getResource(iconResource);
-        if (resource == null) {
-            return null;
+        protected fun icon(iconResource: String): ImageIcon? {
+            val resource = IdeButton::class.java.getResource(iconResource) ?: return null
+            return ImageIcon(resource)
         }
-        return new ImageIcon(resource);
     }
 }
