@@ -18,13 +18,14 @@ import semicontinuity.idea.code.analyzer.golang.StructureFiller
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
+import semicontinuity.idea.code.analyzer.graph.viewModel.ide.CoarseGraphViewFactory
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeButtonHighlightingDispatcher
-import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeViewFactory
+import semicontinuity.idea.code.analyzer.graph.viewModel.ide.MembersGraphViewFactory
+import semicontinuity.idea.code.analyzer.graph.viewModel.ide.RenderHelper
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.util.Objects
 import java.util.function.Function
-import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.ImageIcon
 import javax.swing.JButton
@@ -32,14 +33,12 @@ import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JScrollPane
-import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
-import javax.swing.plaf.basic.BasicButtonUI
 
 @Suppress("HardCodedStringLiteral")
 class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myProject: Project) :
     ProjectComponent {
-    private var viewFactory: IdeViewFactory? = null
+    private var subGraphViewFactory: MembersGraphViewFactory? = null
     private var myContentPanel: JPanel? = null
     private var ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher? = null
 
@@ -120,7 +119,6 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
         myContentPanel.layout = BorderLayout()
         myContentPanel.background = UIUtil.getTreeTextBackground()
         this.myContentPanel = myContentPanel
-
         return myContentPanel
     }
 
@@ -148,54 +146,20 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
         myContentPanel!!.removeAll()
         val globalCallGraph = StructureFiller.fillCallGraph(goFile)
         ideButtonHighlightingDispatcher = IdeButtonHighlightingDispatcher(globalCallGraph)
-        viewFactory = IdeViewFactory(ideButtonHighlightingDispatcher)
-
+        subGraphViewFactory = MembersGraphViewFactory(ideButtonHighlightingDispatcher)
         val split = split(globalCallGraph, { DAGraphImpl() })
-        myContentPanel!!.add(structsView(split))
+        myContentPanel!!.add(coarseGraphView(split), BorderLayout.NORTH)
     }
 
-    private fun structsView(split: CallGraphSplitter.Split): JComponent {
-        return Box.createVerticalBox()
-            .also {
-                split.simpleVertices
-                    .entries
-                    .stream()
-                    .sorted(java.util.Map.Entry.comparingByKey())
-                    .forEach { e ->
-                        it.add(
-                            viewFactory!!.newVertex(e.value)
-                        )
-                    }
+    private fun coarseGraphView(split: CallGraphSplitter.Split): JComponent {
+        val coarseGraphViewFactory = CoarseGraphViewFactory(
+            split.simpleVertices, split.subGraphs, subGraphViewFactory!!,
+        )
 
-                split.subGraphs
-                    .entries
-                    .stream()
-                    .sorted(java.util.Map.Entry.comparingByKey())
-                    .forEach { e: Map.Entry<String, DAGraph<Member>> ->
-                        it.add(
-                            structView(e.key, e.value)
-                        )
-                    }
-            }
-    }
-
-    private fun simpleMemberView(name: String): JComponent {
-        return JButton(name)
-    }
-
-    private fun structView(struct: String, structGraph: DAGraph<Member>): JPanel {
-        val structView = JPanel()
-        structView.layout = BorderLayout()
-
-        structView.border = BorderFactory.createRaisedBevelBorder()
-
-        structView.add(structButton(struct), BorderLayout.NORTH)
-
-        val contents = render(structGraph, viewFactory!!)
-        contents.border = BorderFactory.createLoweredBevelBorder()
-        structView.add(contents, BorderLayout.CENTER)
-
-        return structView
+        val content = DAGraphViewRenderer(
+            split.coarseGraph, coarseGraphViewFactory, Function.identity()
+        ) { it }.render()
+        return Box.createVerticalBox().also { it.add(content) }
     }
 
     private fun unregisterToolWindow() {
@@ -215,19 +179,5 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
         const val TOOL_WINDOW_ID: String = "Code Analysis"
         const val COMPONENT_NAME: String = "Cat.Plugin"
         val LOGGER: Logger = Logger.getLogger(ToolWindow::class.java)
-
-        private fun structButton(struct: String): JButton {
-            val button = JButton(struct)
-            button.border = BorderFactory.createEmptyBorder()
-            button.setUI(BasicButtonUI())
-            button.horizontalAlignment = SwingConstants.LEFT
-            return button
-        }
-
-        private fun render(graph: DAGraph<Member>, viewFactory: IdeViewFactory): JComponent {
-            return DAGraphViewRenderer(
-                graph, viewFactory, Function.identity()
-            ) { obj: Member -> obj.name }.render()
-        }
     }
 }
