@@ -96,11 +96,11 @@ abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
 
     fun sharedDepsBox(contents: JComponent?): JComponent {
         val box = Box.createVerticalBox()
-        // if (showDebugBorders) {
+        if (showDebugBorders) {
             box.border = BorderFactory.createLineBorder(Color.RED)
-        // } else {
-        //     box.border = BorderFactory.createLoweredBevelBorder()
-        // }
+        } else {
+            box.border = BorderFactory.createLoweredBevelBorder()
+        }
 
         box.add(Box.createVerticalGlue())
         box.add(contents)

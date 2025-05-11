@@ -4,6 +4,7 @@ import com.intellij.util.ui.UIUtil
 import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
+import java.awt.Dimension
 import java.util.function.Function
 import javax.swing.BorderFactory
 import javax.swing.Box
@@ -31,7 +32,6 @@ object RenderHelper {
             add(
                 Box.createHorizontalBox().apply {
                     add(structButton(struct))
-                    add(Box.createHorizontalGlue())
                 }
             )
 
@@ -46,6 +46,8 @@ object RenderHelper {
 
     private fun structButton(struct: String) =
         JButton(struct).apply {
+            maximumSize = Dimension(Int.MAX_VALUE, getPreferredSize().height)
+            setHorizontalAlignment(SwingConstants.LEFT);
             foreground = UIUtil.getToolTipBackground()
             background = UIUtil.getToolTipForeground()
             border = BorderFactory.createEmptyBorder()

@@ -18,7 +18,7 @@ class CoarseGraphViewFactory(
         } else {
             val subGraph = subGraphs[vertex]
             if (subGraph == null) {
-                JButton("No subgraph $vertex")
+                JButton(vertex)
             } else {
                 RenderHelper.structView(vertex, subGraph, subGraphViewFactory)
             }
