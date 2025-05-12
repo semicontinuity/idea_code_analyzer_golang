@@ -40,8 +40,7 @@ object RenderHelper {
 
             add(
                 Box.createHorizontalBox().apply {
-                    add(structButton(struct))
-/*
+                    // add(structButton(struct))
                     add(
                         ideButton(
                             member,
@@ -54,7 +53,6 @@ object RenderHelper {
                             background = UIUtil.getToolTipForeground()
                         }
                     )
-*/
                 }
             )
 
@@ -86,7 +84,7 @@ object RenderHelper {
         vertex: Member, ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher, icon: ImageIcon?
     ) = IdeButton(
         vertex.psiElement,
-        vertex.name,
+        if (vertex.name == "") vertex.qualifier else vertex.name,
         icon,
         vertex,
         ideButtonHighlightingDispatcher

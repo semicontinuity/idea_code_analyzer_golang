@@ -160,7 +160,7 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
         )
 
         val content = DAGraphViewRenderer(
-            split.coarseGraph, coarseGraphViewFactory, Function.identity()
+            split.coarseGraph0, coarseGraphViewFactory, Function.identity()
         ) { it }.render()
         return Box.createVerticalBox().also { it.add(content) }
     }

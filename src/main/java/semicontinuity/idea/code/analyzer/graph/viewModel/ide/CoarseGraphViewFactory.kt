@@ -22,7 +22,17 @@ class CoarseGraphViewFactory(
                 JButton(vertex)
             }
         } else {
-            RenderHelper.structView(member!!, vertex, subGraph, subGraphViewFactory, ideButtonHighlightingDispatcher)
+            if (member == null) {
+                JButton(vertex)
+            } else {
+                RenderHelper.structView(
+                    member,
+                    vertex,
+                    subGraph,
+                    subGraphViewFactory,
+                    ideButtonHighlightingDispatcher
+                )
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ import com.goide.psi.GoCallExpr;
 import com.goide.psi.GoCompositeLit;
 import com.goide.psi.GoFile;
 import com.goide.psi.GoFunctionDeclaration;
+import com.goide.psi.GoInterfaceType;
 import com.goide.psi.GoNamedSignatureOwner;
 import com.goide.psi.GoPointerType;
 import com.goide.psi.GoReceiver;
@@ -18,7 +19,10 @@ import com.goide.psi.GoRecursiveVisitor;
 import com.goide.psi.GoRecvStatement;
 import com.goide.psi.GoReferenceExpression;
 import com.goide.psi.GoShortVarDeclaration;
+import com.goide.psi.GoSpecType;
+import com.goide.psi.GoStructType;
 import com.goide.psi.GoType;
+import com.goide.psi.GoTypeDeclaration;
 import com.goide.psi.GoTypeReferenceExpression;
 import com.goide.psi.GoTypeSpec;
 import com.goide.psi.GoUnaryExpr;
@@ -106,6 +110,8 @@ public class GoFileScanner {
         for (GoTypeSpec typeSpec : types) {
             var structName = typeSpec.getIdentifier().getText();
             if (structName.endsWith("TestSuite")) continue;
+
+            vertexSink.accept(new Member(structName, "", typeSpec));
             var allMethods = typeSpec.getAllMethods();
             for (GoNamedSignatureOwner method : allMethods) {
                 vertexSink.accept(new Member(structName, method.getName(), method));
@@ -176,6 +182,26 @@ public class GoFileScanner {
             public void visitTypeReferenceExpression(@NotNull GoTypeReferenceExpression o) {
                 super.visitTypeReferenceExpression(o);
                 processTypeReferenceExpression(o, from);
+            }
+
+            @Override
+            public void visitInterfaceType(@NotNull GoInterfaceType o) {
+                super.visitInterfaceType(o);
+            }
+
+            @Override
+            public void visitStructType(@NotNull GoStructType o) {
+                super.visitStructType(o);
+            }
+
+            @Override
+            public void visitSpecType(@NotNull GoSpecType o) {
+                super.visitSpecType(o);
+            }
+
+            @Override
+            public void visitTypeDeclaration(@NotNull GoTypeDeclaration o) {
+                super.visitTypeDeclaration(o);
             }
         };
     }
