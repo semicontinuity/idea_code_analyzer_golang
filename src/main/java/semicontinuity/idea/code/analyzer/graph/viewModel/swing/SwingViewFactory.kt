@@ -1,85 +1,71 @@
-package semicontinuity.idea.code.analyzer.graph.viewModel.swing;
+package semicontinuity.idea.code.analyzer.graph.viewModel.swing
 
-import java.awt.Color;
-import java.util.List;
+import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
+import java.awt.Color
+import javax.swing.BorderFactory
+import javax.swing.Box
+import javax.swing.JButton
+import javax.swing.JComponent
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComponent;
+class SwingViewFactory : Factory<String, JComponent, JComponent, JComponent, JComponent, JComponent> {
 
-import semicontinuity.idea.code.analyzer.graph.viewModel.Factory;
-
-public class SwingViewFactory implements Factory<
-        String,
-        JComponent,
-        JComponent,
-        JComponent,
-        JComponent,
-        JComponent
-        > {
-
-    @Override
-    public JComponent newVertex(String s) {
-        var box = Box.createHorizontalBox();
-        box.add(new JButton(s));
-        box.add(Box.createHorizontalGlue());
-        return box;
+    override fun newVertex(payload: String): JComponent {
+        val box = Box.createHorizontalBox()
+        box.add(JButton(payload))
+        box.add(Box.createHorizontalGlue())
+        return box
     }
 
-    @Override
-    public JComponent newIndependentComponents(List<? extends JComponent> components) {
-        var box = Box.createVerticalBox();
-        box.setForeground(Color.YELLOW);
-//        box.setBorder(BorderFactory.createEmptyBorder(4, 1, 4, 1));
-        box.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        for (JComponent component : components) {
-            box.add(component);
+    override fun newIndependentComponents(components: List<JComponent?>): JComponent {
+        val box = Box.createVerticalBox()
+        box.foreground = Color.YELLOW
+        //        box.setBorder(BorderFactory.createEmptyBorder(4, 1, 4, 1));
+        box.border = BorderFactory.createLineBorder(Color.BLUE)
+        for (component in components) {
+            box.add(component)
         }
-        return box;
+        return box
     }
 
-    @Override
-    public JComponent newSplit(List<JComponent> items, JComponent subLayer) {
-        var box = Box.createHorizontalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
-        box.add(itemsBox(items));
-        box.add(subLayer);
-        return box;
+    override fun newSplit(items: List<JComponent>, subLayer: JComponent): JComponent {
+        val box = Box.createHorizontalBox()
+        box.border = BorderFactory.createLineBorder(Color.YELLOW)
+        box.add(itemsBox(items))
+        box.add(subLayer)
+        return box
     }
 
-    @Override
-    public JComponent newLayer(JComponent directDeps, JComponent sharedDeps) {
-        var box = Box.createVerticalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-        if (directDeps != null) box.add(directDepsBox(directDeps));
-        if (sharedDeps != null) box.add(sharedDepsBox(sharedDeps));
-        return box;
+    override fun newLayer(directDeps: JComponent?, sharedDeps: JComponent?): JComponent {
+        val box = Box.createVerticalBox()
+        box.border = BorderFactory.createLineBorder(Color.DARK_GRAY)
+        if (directDeps != null) box.add(directDepsBox(directDeps))
+        if (sharedDeps != null) box.add(sharedDepsBox(sharedDeps))
+        return box
     }
 
-    JComponent itemsBox(List<JComponent> items) {
-        var box = Box.createVerticalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.PINK));
-        for (JComponent component : items) {
-            box.add(component);
+    fun itemsBox(items: List<JComponent>): JComponent {
+        val box = Box.createVerticalBox()
+        box.border = BorderFactory.createLineBorder(Color.PINK)
+        for (component in items) {
+            box.add(component)
         }
-        return box;
+        return box
     }
 
-    JComponent directDepsBox(JComponent contents) {
-        var box = Box.createVerticalBox();
-//        box.setBackground(Color.GREEN);
-        box.setBorder(BorderFactory.createLineBorder(Color.GREEN));
-//        box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        box.add(contents);
-        return box;
+    fun directDepsBox(contents: JComponent?): JComponent {
+        val box = Box.createVerticalBox()
+        //        box.setBackground(Color.GREEN);
+        box.border = BorderFactory.createLineBorder(Color.GREEN)
+        //        box.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        box.add(contents)
+        return box
     }
 
-    JComponent sharedDepsBox(JComponent contents) {
-        var box = Box.createVerticalBox();
-        box.setBorder(BorderFactory.createLineBorder(Color.RED));
-//        box.setBorder(BorderFactory.createLoweredBevelBorder());
-        box.add(contents);
-        return box;
+    fun sharedDepsBox(contents: JComponent?): JComponent {
+        val box = Box.createVerticalBox()
+        box.border = BorderFactory.createLineBorder(Color.RED)
+        //        box.setBorder(BorderFactory.createLoweredBevelBorder());
+        box.add(contents)
+        return box
     }
 }

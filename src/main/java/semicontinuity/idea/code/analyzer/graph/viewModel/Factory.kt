@@ -1,21 +1,11 @@
-package semicontinuity.idea.code.analyzer.graph.viewModel;
+package semicontinuity.idea.code.analyzer.graph.viewModel
 
-import java.util.List;
+interface Factory<VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP> {
+    fun newIndependentComponents(components: List<COMP?>): IND_COMPS
 
-public interface Factory<
-        VERTEX_PAYLOAD,
-        COMP,
-        IND_COMPS extends COMP,
-        VERTEX extends COMP,
-        SPLIT extends COMP,
-        LAYER extends COMP
-        > {
+    fun newVertex(payload: VERTEX_PAYLOAD): VERTEX
 
-    IND_COMPS newIndependentComponents(List<? extends COMP> components);
+    fun newSplit(items: List<VERTEX>, subLayer: COMP): SPLIT
 
-    VERTEX newVertex(VERTEX_PAYLOAD payload);
-
-    SPLIT newSplit(List<VERTEX> items, COMP subLayer);
-
-    LAYER newLayer(COMP directDeps, COMP sharedDeps);
+    fun newLayer(directDeps: COMP?, sharedDeps: COMP?): LAYER
 }

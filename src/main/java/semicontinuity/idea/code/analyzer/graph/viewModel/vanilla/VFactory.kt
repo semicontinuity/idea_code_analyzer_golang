@@ -1,35 +1,22 @@
-package semicontinuity.idea.code.analyzer.graph.viewModel.vanilla;
+package semicontinuity.idea.code.analyzer.graph.viewModel.vanilla
 
-import java.util.List;
+import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
 
-import semicontinuity.idea.code.analyzer.graph.viewModel.Factory;
-
-public class VFactory<PAYLOAD> implements Factory<
-        PAYLOAD,
-        VComponent,
-        VIndependentComponents,
-        VMember<PAYLOAD>,
-        VSplit<PAYLOAD>,
-        VLayer
-        > {
-
-    @Override
-    public VIndependentComponents newIndependentComponents(List<? extends VComponent> components) {
-        return new VIndependentComponents(components);
+class VFactory<PAYLOAD> :
+    Factory<PAYLOAD, VComponent?, VIndependentComponents?, VMember<PAYLOAD>?, VSplit<PAYLOAD>?, VLayer?> {
+    override fun newIndependentComponents(components: List<VComponent?>): VIndependentComponents {
+        return VIndependentComponents(components)
     }
 
-    @Override
-    public VMember<PAYLOAD> newVertex(PAYLOAD payload) {
-        return new VMember<>(payload);
+    override fun newVertex(payload: PAYLOAD): VMember<PAYLOAD> {
+        return VMember(payload)
     }
 
-    @Override
-    public VSplit<PAYLOAD> newSplit(List<VMember<PAYLOAD>> items, VComponent subLayer) {
-        return new VSplit<>(items, subLayer);
+    override fun newSplit(items: List<VMember<PAYLOAD>?>, subLayer: VComponent?): VSplit<PAYLOAD> {
+        return VSplit(items, subLayer)
     }
 
-    @Override
-    public VLayer newLayer(VComponent directDeps, VComponent sharedDeps) {
-        return new VLayer(directDeps, sharedDeps);
+    override fun newLayer(directDeps: VComponent?, sharedDeps: VComponent?): VLayer {
+        return VLayer(directDeps, sharedDeps)
     }
 }
