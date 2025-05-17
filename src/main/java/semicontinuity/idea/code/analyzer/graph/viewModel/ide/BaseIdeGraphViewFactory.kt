@@ -11,7 +11,7 @@ import javax.swing.JPanel
 abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
     Factory<VERTEX_PAYLOAD, JComponent, JComponent, JComponent, JComponent, JComponent> {
 
-    override fun newIndependentComponents(components: List<JComponent>): JComponent {
+    override fun newIndependentComponents(components: List<JComponent?>): JComponent {
         val box = Box.createVerticalBox()
         if (showDebugBorders) {
             box.border = BorderFactory.createLineBorder(Color.BLUE)
