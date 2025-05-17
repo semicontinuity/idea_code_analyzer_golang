@@ -1,4 +1,4 @@
-package semicontinuity.idea.code.analyzer.golang
+package semicontinuity.idea.code.analyzer.golang.logic
 
 import com.goide.GoFileType
 import com.goide.psi.GoFile
@@ -63,23 +63,10 @@ fun signaturesMatch(m1: GoNamedSignatureOwner, m2: GoNamedSignatureOwner): Boole
     return getSignatureStructure(m1.signature) == getSignatureStructure(m2.signature)
 }
 
-// Main function: Returns the interface method this method implements, or null
-fun findImplementedInterfaceMethod(method: GoMethodDeclaration): GoMethodSpec? {
-    // this code is run for all methods! move out!
-    val goFile = method.containingFile as? GoFile ?: return null
-    val interfaces = PsiTreeUtil.collectElementsOfType(goFile, GoInterfaceType::class.java)
 
-    for (iface in interfaces) {
-        val ifaceType = iface ?: continue
-        val ifaceMethods = ifaceType.methods // FIXED
-
-        for (ifaceMethod in ifaceMethods) {
-            // Compare names
-            if (ifaceMethod.name == method.name && signaturesMatch(method, ifaceMethod)) {
-                return ifaceMethod
-            }
-        }
-        // Optionally, recursively check embedded interfaces here if desired
-    }
-    return null
-}
+// fun findImplementedInterfaceMethod(method: GoMethodDeclaration): GoMethodSpec? {
+//     val goFile = method.containingFile as? GoFile ?: return null
+//     val interfaces = PsiTreeUtil.collectElementsOfType(goFile, GoInterfaceType::class.java)
+//
+//     return findImplementedInterfaceMethod(interfaces, method)
+// }

@@ -2,6 +2,9 @@ package semicontinuity.idea.code.analyzer.golang
 
 import com.goide.psi.GoFile
 import com.intellij.psi.PsiDirectory
+import semicontinuity.idea.code.analyzer.golang.logic.GoFileScanner
+import semicontinuity.idea.code.analyzer.golang.logic.findGoFiles
+import semicontinuity.idea.code.analyzer.golang.logic.goInterfaceTypes
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl
 import semicontinuity.idea.code.analyzer.util.Context

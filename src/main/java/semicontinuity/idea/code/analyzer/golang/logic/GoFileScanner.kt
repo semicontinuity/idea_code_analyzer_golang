@@ -1,4 +1,4 @@
-package semicontinuity.idea.code.analyzer.golang
+package semicontinuity.idea.code.analyzer.golang.logic
 
 import com.goide.psi.GoBuiltinCallExpr
 import com.goide.psi.GoCallExpr
@@ -6,6 +6,7 @@ import com.goide.psi.GoCompositeLit
 import com.goide.psi.GoFile
 import com.goide.psi.GoFunctionDeclaration
 import com.goide.psi.GoFunctionOrMethodDeclaration
+import com.goide.psi.GoInterfaceType
 import com.goide.psi.GoMethodDeclaration
 import com.goide.psi.GoMethodSpec
 import com.goide.psi.GoPointerType
@@ -23,6 +24,7 @@ import com.intellij.pom.PomTargetPsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.util.Context
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -33,6 +35,8 @@ class GoFileScanner(
     private val vertexSink: Consumer<Member>,
     private val edgeSink: BiConsumer<Member, Member>
 ) {
+    val interfaces: MutableCollection<GoInterfaceType> = PsiTreeUtil.collectElementsOfType(goFile, GoInterfaceType::class.java)
+
     // Could not find a way to check programmatically. Plain function calls are all represented by LeafPsiElement
     private val builtins = setOf(
         "append",
@@ -171,7 +175,9 @@ class GoFileScanner(
                 super.visitFunctionOrMethodDeclaration(o)
 
                 if (o is GoMethodDeclaration) {
-                    val m: GoMethodSpec? = findImplementedInterfaceMethod(o)
+                    // val goFile = o.containingFile as? GoFile ?: return
+
+                    val m: GoMethodSpec? = GoInterfaceSearch(interfaces).findImplementedInterfaceMethod(o)
                     if (m != null) {
                         val ifaceSpec = PsiTreeUtil.getStubOrPsiParentOfType(
                             m,
