@@ -62,11 +62,3 @@ fun getSignatureStructure(signature: GoSignature?): String? {
 fun signaturesMatch(m1: GoNamedSignatureOwner, m2: GoNamedSignatureOwner): Boolean {
     return getSignatureStructure(m1.signature) == getSignatureStructure(m2.signature)
 }
-
-
-// fun findImplementedInterfaceMethod(method: GoMethodDeclaration): GoMethodSpec? {
-//     val goFile = method.containingFile as? GoFile ?: return null
-//     val interfaces = PsiTreeUtil.collectElementsOfType(goFile, GoInterfaceType::class.java)
-//
-//     return findImplementedInterfaceMethod(interfaces, method)
-// }

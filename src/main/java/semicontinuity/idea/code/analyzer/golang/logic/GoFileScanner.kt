@@ -33,10 +33,9 @@ class GoFileScanner(
     private val goFile: GoFile,
     private val context: Context,
     private val vertexSink: Consumer<Member>,
-    private val edgeSink: BiConsumer<Member, Member>
+    private val edgeSink: BiConsumer<Member, Member>,
+    private val interfaces: List<GoInterfaceType>,
 ) {
-    val interfaces: MutableCollection<GoInterfaceType> = PsiTreeUtil.collectElementsOfType(goFile, GoInterfaceType::class.java)
-
     // Could not find a way to check programmatically. Plain function calls are all represented by LeafPsiElement
     private val builtins = setOf(
         "append",
@@ -130,8 +129,6 @@ class GoFileScanner(
     }
 
     private fun visitMethods() {
-        // receiver.getType().getText()
-        // method.getName()
         goFile.methods.forEach(
             Consumer { method: GoMethodDeclaration ->
                 context.log.accept("    Processing calls inside method " + method.qualifiedName)
