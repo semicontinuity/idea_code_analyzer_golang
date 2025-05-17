@@ -12,6 +12,9 @@ object StructureFiller {
     fun fillCallGraph(goFile: GoFile): DAGraph<Member> {
         val context = Context()
 
+        val interfaces = goFile.parent?.let { goInterfaceTypes(findGoFiles(it)) } ?: listOf()
+        println("############################## interfaces = ${interfaces.size}")
+
         val structure = DAGraphImpl<Member>()
         context.log.accept("")
         context.log.accept("")

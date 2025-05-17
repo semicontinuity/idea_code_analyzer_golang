@@ -1,12 +1,45 @@
 package semicontinuity.idea.code.analyzer.golang
 
+import com.goide.GoFileType
 import com.goide.psi.GoFile
 import com.goide.psi.GoInterfaceType
 import com.goide.psi.GoMethodDeclaration
 import com.goide.psi.GoMethodSpec
 import com.goide.psi.GoNamedSignatureOwner
 import com.goide.psi.GoSignature
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiManager
+import com.intellij.psi.search.FileTypeIndex
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+
+fun findGoFilesWithPackage(project: Project, packageName: String): List<GoFile> {
+    val scope = GlobalSearchScope.projectScope(project)
+    val psiManager = PsiManager.getInstance(project)
+    val goFiles = mutableListOf<GoFile>()
+
+    FileTypeIndex.getFiles(GoFileType.INSTANCE, scope).forEach { virtualFile ->
+        val psiFile = psiManager.findFile(virtualFile)
+        if (psiFile is GoFile) {
+            if (psiFile.packageName == packageName) {
+                goFiles.add(psiFile)
+            }
+        }
+    }
+
+    return goFiles
+}
+
+fun findGoFiles(psiDirectory: PsiDirectory): List<GoFile> = psiDirectory.files.filterIsInstance<GoFile>()
+
+fun goInterfaceTypes(goFiles: List<GoFile>): List<GoInterfaceType> {
+    val intefaces: List<GoInterfaceType> = goFiles.flatMap { file ->
+        PsiTreeUtil.collectElementsOfType(file, GoInterfaceType::class.java)
+            .toList()
+    }
+    return intefaces
+}
 
 fun getSignatureStructure(signature: GoSignature?): String? {
     if (signature == null) return null
@@ -32,8 +65,9 @@ fun signaturesMatch(m1: GoNamedSignatureOwner, m2: GoNamedSignatureOwner): Boole
 
 // Main function: Returns the interface method this method implements, or null
 fun findImplementedInterfaceMethod(method: GoMethodDeclaration): GoMethodSpec? {
-    val file = method.containingFile as? GoFile ?: return null
-    val interfaces = PsiTreeUtil.collectElementsOfType(file, GoInterfaceType::class.java).filter { true }
+    // this code is run for all methods! move out!
+    val goFile = method.containingFile as? GoFile ?: return null
+    val interfaces = PsiTreeUtil.collectElementsOfType(goFile, GoInterfaceType::class.java)
 
     for (iface in interfaces) {
         val ifaceType = iface ?: continue
@@ -41,10 +75,7 @@ fun findImplementedInterfaceMethod(method: GoMethodDeclaration): GoMethodSpec? {
 
         for (ifaceMethod in ifaceMethods) {
             // Compare names
-            val b = ifaceMethod.name == method.name
-            val signaturesMatch = signaturesMatch(method, ifaceMethod)
-            if (b && signaturesMatch) {
-                // You can add more checks for assigning value/pointer to interface as needed
+            if (ifaceMethod.name == method.name && signaturesMatch(method, ifaceMethod)) {
                 return ifaceMethod
             }
         }

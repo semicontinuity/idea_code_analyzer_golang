@@ -16,7 +16,6 @@ import com.goide.psi.GoReferenceExpression
 import com.goide.psi.GoShortVarDeclaration
 import com.goide.psi.GoSpecType
 import com.goide.psi.GoTypeReferenceExpression
-import com.goide.psi.GoTypeSpec
 import com.goide.psi.GoUnaryExpr
 import com.goide.psi.GoVarDefinition
 import com.goide.psi.GoVarSpec

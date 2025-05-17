@@ -76,7 +76,7 @@ public class DAGraphDecomposer<V> {
             var subGraph = subGraphFactory.get();
             for (V root : rootGroup) {
                 for (V nextVertex : graph.followers(root)) {
-                    fillSubGraphFrom(nextVertex, subGraph);
+                    fillSubGraphFrom(nextVertex, subGraph, new HashSet<>());
                 }
             }
             result.put(rootGroup, subGraph);
@@ -98,9 +98,10 @@ public class DAGraphDecomposer<V> {
     }
 
     private void doCheckColorFrom(V vertex, V color, HashMap<V, V> colors, HashMap<V, V> parents, Set<V> visited) {
-        for (V follower : graph.followers(vertex)) {
-            if (visited.contains(follower)) continue;
+        if (visited.contains(vertex)) return;
+        visited.add(vertex);
 
+        for (V follower : graph.followers(vertex)) {
             var aColor = colors.get(follower);
             System.out.println("  | " + vertex + "[color:" + color + "] ->" + follower + "[color: " + aColor + "]");
             if (!color.equals(aColor)) {
@@ -110,11 +111,14 @@ public class DAGraphDecomposer<V> {
         }
     }
 
-    void fillSubGraphFrom(V vertex, DAGraph<V> sink) {
+    void fillSubGraphFrom(V vertex, DAGraph<V> sink, Set<V> visited) {
+        if (visited.contains(vertex)) return;
+        visited.add(vertex);
+
         sink.addVertex(vertex);
         for (V follower : graph.followers(vertex)) {
             sink.addEdge(vertex, follower);
-            fillSubGraphFrom(follower, sink);
+            fillSubGraphFrom(follower, sink, visited);
         }
     }
 }
