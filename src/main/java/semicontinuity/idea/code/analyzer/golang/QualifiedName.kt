@@ -1,48 +1,29 @@
-package semicontinuity.idea.code.analyzer.golang;
+package semicontinuity.idea.code.analyzer.golang
 
-public class QualifiedName {
-    private final String qualifier;
-    private final String name;
-
-    public QualifiedName(String qualifier, String name) {
-        this.qualifier = qualifier;
-        this.name = name;
+class QualifiedName(val qualifier: String, val name: String) {
+    override fun toString(): String {
+        return if (qualifier.isEmpty()) name else "$qualifier.$name"
     }
 
-    public String getQualifier() {
-        return qualifier;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return qualifier.isEmpty() ? name : qualifier + '.' + name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (other == null || javaClass != other.javaClass) {
+            return false
         }
 
-        QualifiedName that = (QualifiedName) o;
+        val that = other as QualifiedName
 
-        if (!qualifier.equals(that.qualifier)) {
-            return false;
+        if (qualifier != that.qualifier) {
+            return false
         }
-        return name.equals(that.name);
+        return name == that.name
     }
 
-    @Override
-    public int hashCode() {
-        int result = qualifier.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
+    override fun hashCode(): Int {
+        var result = qualifier.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
     }
 }
