@@ -10,11 +10,11 @@ class DAGraphImplTest implements DAGraphImplTestData1, DAGraphImplTestData5 {
 
     @Test
     void findRoots1() {
-        Assertions.assertEquals(Set.of("r0", "r1", "r2"), new HashSet<>(exampleGraph1().findRoots()));
+        Assertions.assertEquals(Set.of("r0", "r1", "r2"), new HashSet<>(exampleGraph1().rootList()));
     }
 
     @Test
     void findRoots5() {
-        Assertions.assertEquals(Set.of("A", "B", "C"), new HashSet<>(exampleGraph5().findRoots()));
+        Assertions.assertEquals(Set.of("A", "B", "C"), new HashSet<>(exampleGraph5().rootList()));
     }
 }

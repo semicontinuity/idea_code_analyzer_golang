@@ -1,41 +1,43 @@
-package semicontinuity.idea.code.analyzer.graph;
+package semicontinuity.idea.code.analyzer.graph
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer
+import java.util.function.Consumer
 
 /**
  * Direct acyclic graph abstraction.
  * @param <V> the type of the vertex in the graph, must be hashable
- *            it can be just the ID of the vertex, with the node payload kept separately.
- */
-public interface DAGraph<V> {
+ * it can be just the ID of the vertex, with the node payload kept separately.
+</V> */
+interface DAGraph<V> {
+    fun clear()
 
-    void addVertex(V src);
+    fun addVertex(vertex: V)
 
-    boolean hasVertices();
+    fun hasVertices(): Boolean
 
-    Set<V> vertices();
+    fun vertices(): Set<V>
 
-    boolean containsVertex(V vertex);
+    fun containsVertex(vertex: V): Boolean
 
-    void forEachVertex(Consumer<V> consumer);
+    fun forEachVertex(consumer: Consumer<V>)
 
+    fun addEdge(src: V, dst: V)
 
-    void addEdge(V src, V dst);
+    fun hasEdges(): Boolean
 
-    boolean hasEdges();
+    fun incomingEdgeCount(vertex: V): Int
 
-    int incomingEdgeCount(V vertex);
+    fun forEachEdge(consumer: BiConsumer<V, V>)
 
-    void forEachEdge(BiConsumer<V, V> consumer);
+    fun forEachPredecessor(vertex: V, consumer: Consumer<V>)
+    fun forEachFollower(vertex: V, consumer: Consumer<V>)
 
+    fun rootList(): List<V>
 
-    void forEachUpstreamVertex(V vertex, Consumer<V> consumer);
-    void forEachDownstreamVertex(V vertex, Consumer<V> consumer);
+    fun followers(vertex: V): Set<V>
 
-    List<V> findRoots();
+    fun size(): Int
 
-    Set<V> followers(V vertex);
+    fun nonRootList(): List<V>
+    fun followersOf(vertices: Collection<V>): Set<V>
 }

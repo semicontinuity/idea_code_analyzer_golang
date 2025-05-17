@@ -13,7 +13,7 @@ public class DAGraphLayeredLayoutComputer<V> {
     }
 
     public Map<V, Integer> layout() {
-        return layoutFrom(graph.findRoots());
+        return layoutFrom(graph.rootList());
     }
 
     public Map<V, Integer> layoutFrom(List<V> roots) {

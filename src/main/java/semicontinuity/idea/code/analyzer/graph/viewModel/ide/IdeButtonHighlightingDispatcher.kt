@@ -21,11 +21,11 @@ class IdeButtonHighlightingDispatcher(private val callGraph: DAGraph<Member>) :
         deselectAll()
         mapping[vertex]!!.select(MemberHighlightingKind.SUBJECT)
 
-        callGraph.forEachUpstreamVertex(vertex) { caller: Member ->
+        callGraph.forEachPredecessor(vertex) { caller: Member ->
             mapping[caller]!!
                 .select(MemberHighlightingKind.CALLER)
         }
-        callGraph.forEachDownstreamVertex(vertex) { callee: Member ->
+        callGraph.forEachFollower(vertex) { callee: Member ->
             mapping[callee]!!
                 .select(MemberHighlightingKind.CALLEE)
         }

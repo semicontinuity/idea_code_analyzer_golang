@@ -1,132 +1,118 @@
-package semicontinuity.idea.code.analyzer.graph;
+package semicontinuity.idea.code.analyzer.graph
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.function.BiConsumer
+import java.util.function.Consumer
 
-public class DAGraphImpl<N> implements DAGraph<N> {
+class DAGraphImpl<N> : DAGraph<N> {
+    private var hasEdges: Boolean = false
 
-    boolean hasEdges;
+    private val vertices = linkedSetOf<N>()
 
-    private final HashSet<N> vertices = new HashSet<>();
+    private val fwdEdges = linkedMapOf<N, MutableSet<N>>()
+    private val revEdges = linkedMapOf<N, MutableSet<N>>()
 
-    private final HashMap<N, Set<N>> fwdEdges = new HashMap<>();
-    private final HashMap<N, Set<N>> revEdges = new HashMap<>();
-
-
-    @Override
-    public void addVertex(N n) {
-        fwdEdges.computeIfAbsent(n, (k) -> new HashSet<>());
-        revEdges.computeIfAbsent(n, (k) -> new HashSet<>());
-        vertices.add(n);
+    override fun clear() {
+        hasEdges = false
+        vertices.clear()
+        fwdEdges.clear()
+        revEdges.clear()
     }
 
-    @Override
-    public boolean hasVertices() {
-        return !vertices.isEmpty();
+    override fun addVertex(vertex: N) {
+        fwdEdges.computeIfAbsent(vertex) { linkedSetOf() }
+        revEdges.computeIfAbsent(vertex) { linkedSetOf() }
+        vertices.add(vertex)
     }
 
-    @Override
-    public Set<N> vertices() {
-        return vertices;
+    override fun size() = vertices.size
+
+    override fun hasVertices() = vertices.isNotEmpty()
+
+    override fun vertices() = vertices
+
+    override fun containsVertex(vertex: N) = vertices.contains(vertex)
+
+    override fun forEachVertex(consumer: Consumer<N>) {
+        vertices.forEach(consumer)
     }
 
-    @Override
-    public boolean containsVertex(N vertex) {
-        return vertices.contains(vertex);
+    override fun addEdge(src: N, dst: N) {
+        if (src == dst) {
+            // not supported
+        } else {
+            addVertex(src)
+            addVertex(dst)
+            fwdEdges.computeIfAbsent(src) { linkedSetOf() }.add(dst)
+            revEdges.computeIfAbsent(dst) { linkedSetOf() }.add(src)
+            hasEdges = true
+        }
     }
 
-    @Override
-    public void forEachVertex(Consumer<N> consumer) {
-        vertices.forEach(consumer);
-    }
+    override fun hasEdges() = hasEdges
 
-    @Override
-    public void addEdge(N src, N dst) {
-        addVertex(src);
-        addVertex(dst);
-        fwdEdges.computeIfAbsent(src, (k) -> new HashSet<>()).add(dst);
-        revEdges.computeIfAbsent(dst, (k) -> new HashSet<>()).add(src);
-        hasEdges = true;
-    }
-
-    @Override
-    public boolean hasEdges() {
-        return hasEdges;
-    }
-
-    @Override
-    public void forEachEdge(BiConsumer<N, N> consumer) {
-        for (Map.Entry<N, Set<N>> e : fwdEdges.entrySet()) {
-            for (N n : e.getValue()) {
-                consumer.accept(e.getKey(), n);
+    override fun forEachEdge(consumer: BiConsumer<N, N>) {
+        for ((key, value) in fwdEdges) {
+            for (n in value) {
+                consumer.accept(key, n)
             }
         }
     }
 
+    override fun incomingEdgeCount(vertex: N) = revEdges[vertex]?.size ?: 0
 
-    @Override
-    public int incomingEdgeCount(N vertex) {
-        var edges = revEdges.get(vertex);
-        return edges == null ? 0 : edges.size();
+    override fun forEachPredecessor(vertex: N, consumer: Consumer<N>) {
+        revEdges[vertex]!!.forEach(consumer)
     }
 
-    @Override
-    public void forEachUpstreamVertex(N vertex, Consumer<N> consumer) {
-        revEdges.get(vertex).forEach(consumer);
+    override fun forEachFollower(vertex: N, consumer: Consumer<N>) {
+        fwdEdges[vertex]!!.forEach(consumer)
     }
 
-    @Override
-    public void forEachDownstreamVertex(N vertex, Consumer<N> consumer) {
-        fwdEdges.get(vertex).forEach(consumer);
-    }
+    override fun rootList(): List<N> =
+        revEdges.entries
+            .filter { it.value.isEmpty() }
+            .map { it.key }
 
+    override fun nonRootList(): List<N> =
+        revEdges.entries
+            .filter { it.value.isNotEmpty() }
+            .map { it.key }
 
-    @Override
-    public List<N> findRoots() {
-        return revEdges.entrySet().stream()
-                .filter(entry -> entry.getValue().size() == 0)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-    }
+    override fun followers(vertex: N) =
+        fwdEdges[vertex] ?: setOf()
 
-    @Override
-    public Set<N> followers(N vertex) {
-        return fwdEdges.get(vertex);
-    }
-
-
-    @Override
-    public String toString() {
-        return fwdEdges.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun followersOf(vertices: Collection<N>): Set<N> {
+        val result = linkedSetOf<N>()
+        vertices.forEach { node ->
+            forEachFollower(node) {
+                result.add(it)
+            }
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        return result
+    }
+
+    override fun toString() =
+        fwdEdges.toString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (other == null || javaClass != other.javaClass) {
+            return false
         }
 
-        DAGraphImpl<?> graph = (DAGraphImpl<?>) o;
+        val graph = other as DAGraphImpl<*>
 
-        if (!fwdEdges.equals(graph.fwdEdges)) {
-            return false;
+        if (fwdEdges != graph.fwdEdges) {
+            return false
         }
-        return revEdges.equals(graph.revEdges);
+        return revEdges == graph.revEdges
     }
 
-    @Override
-    public int hashCode() {
-        int result = fwdEdges.hashCode();
-        result = 31 * result + revEdges.hashCode();
-        return result;
+    override fun hashCode(): Int {
+        var result = fwdEdges.hashCode()
+        result = 31 * result + revEdges.hashCode()
+        return result
     }
 }
