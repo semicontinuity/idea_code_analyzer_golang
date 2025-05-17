@@ -5,8 +5,9 @@ import com.goide.psi.GoCallExpr
 import com.goide.psi.GoCompositeLit
 import com.goide.psi.GoFile
 import com.goide.psi.GoFunctionDeclaration
-import com.goide.psi.GoInterfaceType
+import com.goide.psi.GoFunctionOrMethodDeclaration
 import com.goide.psi.GoMethodDeclaration
+import com.goide.psi.GoMethodSpec
 import com.goide.psi.GoPointerType
 import com.goide.psi.GoReceiver
 import com.goide.psi.GoRecursiveVisitor
@@ -14,15 +15,15 @@ import com.goide.psi.GoRecvStatement
 import com.goide.psi.GoReferenceExpression
 import com.goide.psi.GoShortVarDeclaration
 import com.goide.psi.GoSpecType
-import com.goide.psi.GoStructType
-import com.goide.psi.GoTypeDeclaration
 import com.goide.psi.GoTypeReferenceExpression
+import com.goide.psi.GoTypeSpec
 import com.goide.psi.GoUnaryExpr
 import com.goide.psi.GoVarDefinition
 import com.goide.psi.GoVarSpec
 import com.intellij.pom.PomTargetPsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import semicontinuity.idea.code.analyzer.util.Context
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -129,7 +130,7 @@ class GoFileScanner(
         // receiver.getType().getText()
         // method.getName()
         goFile.methods.forEach(
-            Consumer<GoMethodDeclaration> { method: GoMethodDeclaration ->
+            Consumer { method: GoMethodDeclaration ->
                 context.log.accept("    Processing calls inside method " + method.qualifiedName)
                 val qualifier = typeName(method.receiver!!)
                 if (!qualifier.endsWith("TestSuite")) {
@@ -167,20 +168,22 @@ class GoFileScanner(
                 processTypeReferenceExpression(o, from)
             }
 
-            override fun visitInterfaceType(o: GoInterfaceType) {
-                super.visitInterfaceType(o)
-            }
+            override fun visitFunctionOrMethodDeclaration(o: GoFunctionOrMethodDeclaration) {
+                super.visitFunctionOrMethodDeclaration(o)
 
-            override fun visitStructType(o: GoStructType) {
-                super.visitStructType(o)
-            }
-
-            override fun visitSpecType(o: GoSpecType) {
-                super.visitSpecType(o)
-            }
-
-            override fun visitTypeDeclaration(o: GoTypeDeclaration) {
-                super.visitTypeDeclaration(o)
+                if (o is GoMethodDeclaration) {
+                    val m: GoMethodSpec? = findImplementedInterfaceMethod(o)
+                    if (m != null) {
+                        val ifaceSpec = PsiTreeUtil.getStubOrPsiParentOfType(
+                            m,
+                            GoSpecType::class.java
+                        )
+                        if (ifaceSpec != null) {
+                            // reverse: "interface uses impl"
+                            edgeSink.accept(Member(ifaceSpec.identifier.text, from.name, m), from)
+                        }
+                    }
+                }
             }
         }
     }

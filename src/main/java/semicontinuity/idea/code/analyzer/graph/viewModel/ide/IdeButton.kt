@@ -13,7 +13,7 @@ import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.plaf.basic.BasicButtonUI
 
-class IdeButton protected constructor(
+class IdeButton(
     element: PsiElement,
     text: String?,
     icon: Icon?,
