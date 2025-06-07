@@ -3,7 +3,7 @@ package semicontinuity.idea.code.analyzer.graph.viewModel.vanilla;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind", include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonSubTypes(
         {
                 @JsonSubTypes.Type(value = VIndependentComponents.class, name = "independent"),

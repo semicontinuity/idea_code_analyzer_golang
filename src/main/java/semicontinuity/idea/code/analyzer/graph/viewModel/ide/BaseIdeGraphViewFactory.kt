@@ -1,12 +1,10 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
 import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
-import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.JComponent
-import javax.swing.JPanel
 
 abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
     Factory<VERTEX_PAYLOAD, JComponent, JComponent, JComponent, JComponent, JComponent> {
