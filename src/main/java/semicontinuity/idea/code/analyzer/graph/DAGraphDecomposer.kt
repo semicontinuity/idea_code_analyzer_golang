@@ -1,157 +1,139 @@
-package semicontinuity.idea.code.analyzer.graph;
+package semicontinuity.idea.code.analyzer.graph
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import semicontinuity.idea.code.analyzer.util.CloseableConsumer
+import java.util.function.Consumer
+import java.util.function.Supplier
 
-import org.jetbrains.annotations.NotNull;
+class DAGraphDecomposer<V>(
+    private val graph: DAGraph<V>,
+    private val log: CloseableConsumer<String> = CloseableConsumer.noOp(),
+) {
+    private val subGraphFactory = Supplier<DAGraph<V>> { DAGraphImpl() }
 
-public class DAGraphDecomposer<V> {
-
-    private final DAGraph<V> graph;
-    private final Supplier<DAGraph<V>> subGraphFactory = DAGraphImpl::new;
-
-    public DAGraphDecomposer(DAGraph<V> graph) {
-        this.graph = graph;
+    fun decompose(): Map<Set<V>, DAGraph<V>> {
+        val roots = graph.rootList()
+        println("| decompose: " + roots.size + " roots = " + roots)
+        return decomposeFrom(roots)
     }
 
-    public Map<Set<V>, DAGraph<V>> decompose() {
-        var roots = graph.rootList();
-        System.out.println("| decompose: " + roots.size() + " roots = " + roots);
-        return decomposeFrom(roots);
-    }
-
-    public Map<Set<V>, DAGraph<V>> decomposeFrom(List<V> roots) {
-        var colors = paintWithRootColors(roots);
+    fun decomposeFrom(roots: List<V>): Map<Set<V>, DAGraph<V>> {
+        val colors = paintWithRootColors(roots)
 
         // Traverse the graph, detecting mis-colorings:
         // If the color of a vertex differs form the color of its root, then it has been re-painted from another root.
         // It means, that sub-graphs, starting at these roots, are connected.
         // Will track this connectedness in the 'parent' hash map.
-        var parents = computeParents(roots, colors);
+        val parents = computeParents(roots, colors)
 
-        var realParents = unionSetFind(roots, parents);
+        val realParents = unionSetFind(roots, parents)
+        dumpMap(realParents)
 
-        System.out.println("| decomposeFrom: realParents");
-        dumpMap(realParents);
+        val rootGroups = invertToSets(realParents)
 
-        var rootGroups = invertToSets(realParents);
-
-        return subGraphsForRoots(rootGroups);
+        return subGraphsForRoots(rootGroups)
     }
 
-    private static <V> Map<V, Set<V>> invertToSets(HashMap<V, V> realParents) {
-        return realParents
-                .entrySet()
-                .stream()
-                .collect(
-                        Collectors.groupingBy(
-                                Map.Entry::getValue,
-                                Collectors.mapping(Map.Entry::getKey, Collectors.toSet())
-                        )
-                );
-    }
+    private fun subGraphsForRoots(rootGroups: Map<V, Set<V>>): HashMap<Set<V>, DAGraph<V>> {
+        println("| decomposeFrom " + rootGroups.size + " rootGroups")
+        val result = HashMap<Set<V>, DAGraph<V>>()
+        for (rootGroup in rootGroups.values) {
+            println("| decomposeFrom: rootGroup=$rootGroup")
 
-    private HashMap<Set<V>, DAGraph<V>> subGraphsForRoots(Map<V, Set<V>> rootGroups) {
-        System.out.println("| decomposeFrom " + rootGroups.size() + " rootGroups");
-        var result = new HashMap<Set<V>, DAGraph<V>>();
-        for (Set<V> rootGroup : rootGroups.values()) {
-            System.out.println("| decomposeFrom: rootGroup=" + rootGroup);
-
-            var subGraph = subGraphFactory.get();
-            for (V root : rootGroup) {
-                for (V nextVertex : graph.followers(root)) {
-                    fillSubGraphFrom(nextVertex, subGraph, new HashSet<>());
+            val subGraph = subGraphFactory.get()
+            for (root in rootGroup) {
+                for (nextVertex in graph.followers(root)) {
+                    fillSubGraphFrom(nextVertex, subGraph, HashSet())
                 }
             }
-            result.put(rootGroup, subGraph);
+            result[rootGroup] = subGraph
         }
 
-        return result;
+        return result
     }
 
-    private static <V> void dumpMap(HashMap<V, V> realParents) {
-        realParents.forEach((key, value) -> System.out.println("  key=" + key + "\tvalue=" + value));
-    }
-
-    private static <V> @NotNull HashMap<V, V> unionSetFind(List<V> roots, HashMap<V, V> parents) {
-        // "Union set find"
-        var realParents = new HashMap<V, V>();
-        roots.forEach(v -> {
-            var curN = v;
-            while (true) {
-                var parent = parents.get(curN);
-                if (parent == curN) break;
-                curN = parent;
-            }
-            realParents.put(v, curN);
-        });
-        return realParents;
-    }
-
-    private @NotNull HashMap<V, V> computeParents(List<V> roots, HashMap<V, V> colors) {
-        var parents = new HashMap<V, V>();
-        for (V root : roots) {
-            parents.put(root, root);
+    private fun computeParents(roots: List<V>, colors: HashMap<V, V>): HashMap<V, V> {
+        val parents = HashMap<V, V>()
+        for (root in roots) {
+            parents[root] = root
         }
-        for (V root : roots) {
-            checkColorFrom(root, root, colors, parents);
+        for (root in roots) {
+            checkColorFrom(root, root, colors, parents)
         }
 
-        System.out.println("| decomposeFrom: parents");
-        dumpMap(parents);
-        System.out.println("| decomposeFrom...");
-        return parents;
+        println("| decomposeFrom: parents")
+        dumpMap(parents)
+        println("| decomposeFrom...")
+        return parents
     }
 
-    private @NotNull HashMap<V, V> paintWithRootColors(List<V> roots) {
+    private fun paintWithRootColors(roots: List<V>): HashMap<V, V> {
         // Paint every vertex with the 'color' of its root.
-        var colors = new HashMap<V, V>();
-        for (V root : roots) {
-            paintFrom(root, root, colors);
+        val colors = HashMap<V, V>()
+        for (root in roots) {
+            paintFrom(root, root, colors)
         }
-        System.out.println("| decomposeFrom: " + roots.size() + " roots: colors=" + colors);
-        return colors;
+        println("| decomposeFrom: " + roots.size + " roots: colors=" + colors)
+        return colors
     }
 
-    private void paintFrom(V vertex, V color, HashMap<V, V> colors) {
-        for (V follower : graph.followers(vertex)) {
+    private fun paintFrom(vertex: V, color: V, colors: HashMap<V, V>) {
+        for (follower in graph.followers(vertex)) {
             if (colors.putIfAbsent(follower, color) == null) {
-                paintFrom(follower, color, colors);
+                paintFrom(follower, color, colors)
             }
         }
     }
 
-    private void checkColorFrom(V vertex, V color, HashMap<V, V> colors, HashMap<V, V> parents) {
-        doCheckColorFrom(vertex, color, colors, parents, new HashSet<>());
+    private fun checkColorFrom(vertex: V, color: V, colors: HashMap<V, V>, parents: HashMap<V, V>) {
+        doCheckColorFrom(vertex, color, colors, parents, HashSet())
     }
 
-    private void doCheckColorFrom(V vertex, V color, HashMap<V, V> colors, HashMap<V, V> parents, Set<V> visited) {
-        if (visited.contains(vertex)) return;
-        visited.add(vertex);
+    private fun doCheckColorFrom(
+        vertex: V,
+        color: V,
+        colors: Map<V, V>,
+        parents: MutableMap<V, V>,
+        visited: MutableSet<V>
+    ) {
+        if (visited.contains(vertex)) return
+        visited.add(vertex)
 
-        for (V follower : graph.followers(vertex)) {
-            var aColor = colors.get(follower);
-            System.out.println("  | " + vertex + "[color:" + color + "] ->" + follower + "[color: " + aColor + "]");
-            if (!color.equals(aColor)) {
-                parents.put(color, aColor);
+        for (follower in graph.followers(vertex)) {
+            val aColor: V? = colors[follower]
+            println("  | $vertex[color:$color] ->$follower[color: $aColor]")
+            if (color != aColor && aColor != null) {
+                parents[color] = aColor
             }
-            doCheckColorFrom(follower, color, colors, parents, visited);
+            doCheckColorFrom(follower, color, colors, parents, visited)
         }
     }
 
-    void fillSubGraphFrom(V vertex, DAGraph<V> sink, Set<V> visited) {
-        if (visited.contains(vertex)) return;
-        visited.add(vertex);
+    fun fillSubGraphFrom(vertex: V, sink: DAGraph<V>, visited: MutableSet<V>) {
+        if (visited.contains(vertex)) return
+        visited.add(vertex)
 
-        sink.addVertex(vertex);
-        for (V follower : graph.followers(vertex)) {
-            sink.addEdge(vertex, follower);
-            fillSubGraphFrom(follower, sink, visited);
+        sink.addVertex(vertex)
+        for (follower in graph.followers(vertex)) {
+            sink.addEdge(vertex, follower)
+            fillSubGraphFrom(follower, sink, visited)
         }
+    }
+
+    private fun unionSetFind(roots: List<V>, parents: Map<V, V>): Map<V, V> {
+        val realParents = linkedMapOf<V, V>()
+        roots.forEach(Consumer { n ->
+            var curN = n
+            while (true) {
+                val parent = parents[curN]
+                if (parent === curN) break
+                curN = parent
+            }
+            realParents[n] = curN
+        })
+        return realParents
+    }
+
+    private fun <K, V> dumpMap(map: Map<K, V>) {
+        map.forEach { (key, value) -> log.accept("  key=$key\tvalue=$value") }
     }
 }
