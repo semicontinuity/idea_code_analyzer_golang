@@ -1,7 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -92,11 +92,11 @@ class DAGraphImpl<V> : DAGraph<V> {
     override fun predecessors(vertex: V) =
         revEdges[vertex] ?: setOf()
 
-    override fun predecessorCount(vertex: V) = revEdges[vertex]?.size ?: 0
+    override fun predecessorCount(vertex: V) =
+        revEdges[vertex]?.size ?: 0
 
-    override fun forEachPredecessor(vertex: V, consumer: Consumer<V>) {
+    override fun forEachPredecessor(vertex: V, consumer: Consumer<V>) =
         revEdges[vertex]!!.forEach(consumer)
-    }
 
 
     override fun toString() =

@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface DAGraphImplTestData2 {
 
-    default DAGraphImpl<String> exampleGraph2() {
+    default DAGraph<String> exampleGraph2() {
 
         // r0 --> m1 -     --> f1
         //            \   /
@@ -17,6 +17,25 @@ public interface DAGraphImplTestData2 {
         g.addEdge("d1", "f1");
         g.addEdge("d1", "f2");
         return g;
+    }
+
+    default DAGraph<String> exampleGraph2Front() {
+        DAGraph<String> expectedFront = new DAGraphImpl<>();
+        expectedFront.addVertex("r0");
+        expectedFront.addVertex("r1");
+        expectedFront.addVertex("m1");
+        expectedFront.addEdge("r0", "m1");
+        return expectedFront;
+    }
+
+    default DAGraph<String> exampleGraph2Back() {
+        DAGraph<String> expectedBack = new DAGraphImpl<>();
+        expectedBack.addVertex("d1");
+        expectedBack.addVertex("f1");
+        expectedBack.addVertex("f2");
+        expectedBack.addEdge("d1", "f1");
+        expectedBack.addEdge("d1", "f2");
+        return expectedBack;
     }
 
     default DAGraph<String> exampleGraph2SubgraphR0R1() {
