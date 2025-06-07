@@ -12,11 +12,11 @@ class DAGraphDecomposer<V>(
 
     fun decompose(): Map<Set<V>, DAGraph<V>> {
         val roots = graph.rootList()
-        println("| decompose: " + roots.size + " roots = " + roots)
-        return decomposeFrom(roots)
+        val rootGroups = rootGroups(roots)
+        return subGraphsForRoots(rootGroups)
     }
 
-    fun decomposeFrom(roots: List<V>): Map<Set<V>, DAGraph<V>> {
+    private fun rootGroups(roots: List<V>): Map<V, Set<V>> {
         val colors = paintWithRootColors(roots)
 
         // Traverse the graph, detecting mis-colorings:
@@ -28,9 +28,7 @@ class DAGraphDecomposer<V>(
         val realParents = unionSetFind(roots, parents)
         dumpMap(realParents)
 
-        val rootGroups = invertToSets(realParents)
-
-        return subGraphsForRoots(rootGroups)
+        return invertToSets(realParents)
     }
 
     private fun subGraphsForRoots(rootGroups: Map<V, Set<V>>): HashMap<Set<V>, DAGraph<V>> {
