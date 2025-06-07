@@ -174,15 +174,31 @@ class GoFileScanner(
                 if (o is GoMethodDeclaration) {
                     // val goFile = o.containingFile as? GoFile ?: return
 
-                    val m: GoMethodSpec? = GoInterfaceSearch(interfaces).findImplementedInterfaceMethod(o)
-                    if (m != null) {
-                        val ifaceSpec = PsiTreeUtil.getStubOrPsiParentOfType(
-                            m,
+                    val implementedMethod: GoMethodSpec? = GoInterfaceSearch(interfaces).findImplementedInterfaceMethod(o)
+                    if (implementedMethod != null) {
+                        val implementedInterfaceSpec = PsiTreeUtil.getStubOrPsiParentOfType(
+                            implementedMethod,
                             GoSpecType::class.java
                         )
-                        if (ifaceSpec != null) {
+
+                        if (implementedInterfaceSpec != null) {
                             // reverse: "interface uses impl"
-                            edgeSink.accept(Member(ifaceSpec.identifier.text, from.name, m), from)
+                            edgeSink.accept(
+                                Member(implementedInterfaceSpec.identifier.text, from.name, implementedMethod),
+                                from
+                            )
+
+                            val structMethodDeclaration = from.psiElement as? GoMethodDeclaration
+                            if (structMethodDeclaration != null) {
+                                val structSpec = findStructFromMethodDeclaration(structMethodDeclaration)
+                                if (structSpec != null) {
+                                    // dependency of type "interface uses struct" (intentionally reverse)
+                                    edgeSink.accept(
+                                        Member(implementedInterfaceSpec.identifier.text, "", implementedInterfaceSpec),
+                                        Member(from.qualifier, "", structSpec),
+                                    )
+                                }
+                            }
                         }
                     }
                 }
