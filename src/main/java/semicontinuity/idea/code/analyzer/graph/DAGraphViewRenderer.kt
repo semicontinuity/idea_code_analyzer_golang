@@ -19,7 +19,7 @@ class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : CO
         this.viewFactory = viewFactory
         this.payloadFunction = payloadFunction
         this.multiPredecessorVertices =
-            graph.vertices().stream().filter { v: V -> graph.incomingEdgeCount(v) > 1 }.collect(
+            graph.vertices().stream().filter { v: V -> graph.predecessorCount(v) > 1 }.collect(
                 Collectors.toSet()
             )
         this.sortKeyFunction = sortKeyFunction

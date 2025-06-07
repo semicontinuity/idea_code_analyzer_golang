@@ -3,13 +3,16 @@ package semicontinuity.idea.code.analyzer.graph
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-class DAGraphImpl<N> : DAGraph<N> {
+class DAGraphImpl<V> : DAGraph<V> {
     private var hasEdges: Boolean = false
 
-    private val vertices = linkedSetOf<N>()
+    private val vertices = linkedSetOf<V>()
 
-    private val fwdEdges = linkedMapOf<N, MutableSet<N>>()
-    private val revEdges = linkedMapOf<N, MutableSet<N>>()
+    private val fwdEdges = linkedMapOf<V, MutableSet<V>>()
+    private val revEdges = linkedMapOf<V, MutableSet<V>>()
+
+
+    override fun size() = vertices.size
 
     override fun clear() {
         hasEdges = false
@@ -18,25 +21,35 @@ class DAGraphImpl<N> : DAGraph<N> {
         revEdges.clear()
     }
 
-    override fun addVertex(vertex: N) {
+    override fun addVertex(vertex: V) {
         fwdEdges.computeIfAbsent(vertex) { linkedSetOf() }
         revEdges.computeIfAbsent(vertex) { linkedSetOf() }
         vertices.add(vertex)
     }
 
-    override fun size() = vertices.size
-
     override fun hasVertices() = vertices.isNotEmpty()
 
     override fun vertices() = vertices
 
-    override fun containsVertex(vertex: N) = vertices.contains(vertex)
+    override fun containsVertex(vertex: V) = vertices.contains(vertex)
 
-    override fun forEachVertex(consumer: Consumer<N>) {
+    override fun forEachVertex(consumer: Consumer<V>) {
         vertices.forEach(consumer)
     }
 
-    override fun addEdge(src: N, dst: N) {
+
+    override fun rootList(): List<V> =
+        revEdges.entries
+            .filter { it.value.isEmpty() }
+            .map { it.key }
+
+    override fun nonRootList(): List<V> =
+        revEdges.entries
+            .filter { it.value.isNotEmpty() }
+            .map { it.key }
+
+
+    override fun addEdge(src: V, dst: V) {
         if (src == dst) {
             // not supported
         } else {
@@ -50,7 +63,7 @@ class DAGraphImpl<N> : DAGraph<N> {
 
     override fun hasEdges() = hasEdges
 
-    override fun forEachEdge(consumer: BiConsumer<N, N>) {
+    override fun forEachEdge(consumer: BiConsumer<V, V>) {
         for ((key, value) in fwdEdges) {
             for (n in value) {
                 consumer.accept(key, n)
@@ -58,31 +71,11 @@ class DAGraphImpl<N> : DAGraph<N> {
         }
     }
 
-    override fun incomingEdgeCount(vertex: N) = revEdges[vertex]?.size ?: 0
-
-    override fun forEachPredecessor(vertex: N, consumer: Consumer<N>) {
-        revEdges[vertex]!!.forEach(consumer)
-    }
-
-    override fun forEachFollower(vertex: N, consumer: Consumer<N>) {
-        fwdEdges[vertex]!!.forEach(consumer)
-    }
-
-    override fun rootList(): List<N> =
-        revEdges.entries
-            .filter { it.value.isEmpty() }
-            .map { it.key }
-
-    override fun nonRootList(): List<N> =
-        revEdges.entries
-            .filter { it.value.isNotEmpty() }
-            .map { it.key }
-
-    override fun followers(vertex: N) =
+    override fun followers(vertex: V) =
         fwdEdges[vertex] ?: setOf()
 
-    override fun followersOf(vertices: Collection<N>): Set<N> {
-        val result = linkedSetOf<N>()
+    override fun followersOf(vertices: Collection<V>): Set<V> {
+        val result = linkedSetOf<V>()
         vertices.forEach { node ->
             forEachFollower(node) {
                 result.add(it)
@@ -90,6 +83,21 @@ class DAGraphImpl<N> : DAGraph<N> {
         }
         return result
     }
+
+    override fun forEachFollower(vertex: V, consumer: Consumer<V>) {
+        fwdEdges[vertex]!!.forEach(consumer)
+    }
+
+
+    override fun predecessors(vertex: V) =
+        revEdges[vertex] ?: setOf()
+
+    override fun predecessorCount(vertex: V) = revEdges[vertex]?.size ?: 0
+
+    override fun forEachPredecessor(vertex: V, consumer: Consumer<V>) {
+        revEdges[vertex]!!.forEach(consumer)
+    }
+
 
     override fun toString() =
         fwdEdges.toString()
