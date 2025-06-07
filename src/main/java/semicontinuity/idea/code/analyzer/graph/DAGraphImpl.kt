@@ -12,8 +12,6 @@ class DAGraphImpl<V> : DAGraph<V> {
     private val revEdges = linkedMapOf<V, MutableSet<V>>()
 
 
-    override fun size() = vertices.size
-
     override fun clear() {
         hasEdges = false
         vertices.clear()
@@ -26,6 +24,8 @@ class DAGraphImpl<V> : DAGraph<V> {
         revEdges.computeIfAbsent(vertex) { linkedSetOf() }
         vertices.add(vertex)
     }
+
+    override fun vertexCount() = vertices.size
 
     override fun hasVertices() = vertices.isNotEmpty()
 

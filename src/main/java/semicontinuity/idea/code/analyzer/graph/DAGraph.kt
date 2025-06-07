@@ -7,19 +7,20 @@ import java.util.function.Consumer
  * Direct acyclic graph abstraction.
  * @param <V> The type of the vertex in the graph. Must be hashable.
  *            It can be just the ID of the vertex, with the node payload kept separately.
-</V> */
+ */
 interface DAGraph<V> {
-    /**
-     * Obtains the number of vertices in the graph
-     */
-    fun size(): Int
-
     /**
      * Clears the graph (removes all vertices and edges)
      */
     fun clear()
 
+
     fun addVertex(vertex: V)
+
+    /**
+     * Obtains the number of vertices in the graph
+     */
+    fun vertexCount(): Int
 
     fun hasVertices(): Boolean
 

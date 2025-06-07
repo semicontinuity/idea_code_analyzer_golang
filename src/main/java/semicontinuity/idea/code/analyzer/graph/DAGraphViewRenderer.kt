@@ -34,7 +34,7 @@ class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : CO
         if (!graph.hasVertices()) return null
 
         println("=================================================================================================")
-        println("doRender graph; " + graph.size() + " vertices=" + graph.vertices())
+        println("doRender graph; " + graph.vertexCount() + " vertices=" + graph.vertices())
         println("=================================================================================================")
 
         return if (!graph.hasEdges()) {
