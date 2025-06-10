@@ -1,6 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel
 
-interface Factory<VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP> {
+interface Factory<VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP, SPLIT0 : COMP> {
 
     fun independentCompsIfManyOrNullIfEmpty(items: List<COMP?>): COMP? =
         if (items.isEmpty()) {
@@ -21,6 +21,8 @@ interface Factory<VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT :
     fun newVertex(payload: VERTEX_PAYLOAD): VERTEX
 
     fun newSplit(items: List<VERTEX>, subLayer: COMP): SPLIT
+
+    fun newSplit(left: COMP, right: COMP): SPLIT0
 
     fun newLayer(directDeps: COMP?, sharedDeps: COMP?): LAYER
 }

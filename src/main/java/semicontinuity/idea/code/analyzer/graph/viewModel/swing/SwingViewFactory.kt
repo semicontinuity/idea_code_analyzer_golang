@@ -1,5 +1,6 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.swing
 
+import com.intellij.ui.JBColor
 import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
 import java.awt.Color
 import javax.swing.BorderFactory
@@ -7,7 +8,7 @@ import javax.swing.Box
 import javax.swing.JButton
 import javax.swing.JComponent
 
-class SwingViewFactory : Factory<String, JComponent, JComponent, JComponent, JComponent, JComponent> {
+class SwingViewFactory : Factory<String, JComponent, JComponent, JComponent, JComponent, JComponent, JComponent> {
 
     override fun newVertex(payload: String): JComponent {
         val box = Box.createHorizontalBox()
@@ -34,6 +35,13 @@ class SwingViewFactory : Factory<String, JComponent, JComponent, JComponent, JCo
         box.add(subLayer)
         return box
     }
+
+    override fun newSplit(left: JComponent, right: JComponent) =
+        Box.createHorizontalBox().apply {
+            setBorder(BorderFactory.createLineBorder(JBColor.YELLOW))
+            add(left)
+            add(right)
+        }
 
     override fun newLayer(directDeps: JComponent?, sharedDeps: JComponent?): JComponent {
         val box = Box.createVerticalBox()
