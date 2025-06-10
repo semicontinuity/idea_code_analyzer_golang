@@ -3,8 +3,7 @@ package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 import com.intellij.util.ui.UIUtil
 import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.graph.DAGraph
-import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
-import semicontinuity.idea.code.analyzer.graph.DAGraphViewRendererDelegate1
+import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer1
 import java.awt.Dimension
 import java.util.function.Function
 import javax.swing.BorderFactory
@@ -77,17 +76,11 @@ object RenderHelper {
         }
 
     private fun render(graph: DAGraph<Member>, viewFactory: MembersGraphViewFactory) =
-        DAGraphViewRenderer(
-            graph,
+        DAGraphViewRenderer1(
             viewFactory,
             Function.identity(),
             { obj: Member -> obj.name },
-            DAGraphViewRendererDelegate1(
-                viewFactory,
-                Function.identity(),
-                { obj: Member -> obj.name },
-            )::doRender,
-        ) .render()
+        ) .render(graph)
 
     fun ideButton(
         vertex: Member, ideButtonHighlightingDispatcher: IdeButtonHighlightingDispatcher, icon: ImageIcon?

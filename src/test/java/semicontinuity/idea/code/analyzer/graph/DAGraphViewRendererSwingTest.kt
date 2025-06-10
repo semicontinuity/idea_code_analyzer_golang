@@ -49,18 +49,11 @@ internal class DAGraphViewRendererSwingTest
             System.setProperty("sun.java2d.uiScale", "4")
         }
 
-        private fun render(graph: DAGraph<String>): JComponent {
-            return DAGraphViewRenderer(
-                graph, SwingViewFactory(),
-                { id: String -> id },
+        private fun render(graph: DAGraph<String>): JComponent =
+            DAGraphViewRenderer1(
+                SwingViewFactory(), { id: String -> id },
                 { s: String -> s },
-                DAGraphViewRendererDelegate1(
-                    SwingViewFactory(),
-                    { id: String -> id },
-                    { s: String -> s },
-                )::doRender,
-            ).render()
-        }
+            ).render(graph)
 
         private fun frame(contents: JComponent): JFrame {
             val f = JFrame("test")

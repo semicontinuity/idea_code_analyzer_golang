@@ -26,20 +26,12 @@ internal class DAGraphViewRendererTest : DAGraphImplTestData1, DAGraphImplTestDa
 
     @Throws(JsonProcessingException::class)
     private fun render(graph: DAGraph<String>) {
-        val renderer =
-            DAGraphViewRenderer(
-                graph,
-                VFactory(),
-                { id: String -> id },
-                { s: String -> s },
-                DAGraphViewRendererDelegate1(
-                    VFactory(),
-                    { id: String -> id },
-                    { s: String -> s },
-                )::doRender
-            )
+        val renderer = DAGraphViewRenderer1(
+            VFactory(),
+            { id: String -> id },
+            { s: String -> s },
+        )
 
-        val render = renderer.render()
-        println(ObjectMapper().writeValueAsString(render))
+        println(ObjectMapper().writeValueAsString(renderer.render(graph)))
     }
 }

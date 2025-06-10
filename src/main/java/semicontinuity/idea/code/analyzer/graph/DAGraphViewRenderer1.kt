@@ -4,12 +4,16 @@ import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
 import java.util.function.Function
 import java.util.stream.Collectors
 
-class DAGraphViewRendererDelegate1<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP, SORT_KEY : Comparable<SORT_KEY>?>(
-    private val viewFactory: Factory<VERTEX_PAYLOAD, COMP, IND_COMPS, VERTEX, SPLIT, LAYER>,
-    private val payloadFunction: Function<V, VERTEX_PAYLOAD>,
-    private val sortKeyFunction: Function<V, SORT_KEY>,
+class DAGraphViewRenderer1<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP, SORT_KEY : Comparable<SORT_KEY>?>(
+    viewFactory: Factory<VERTEX_PAYLOAD, COMP, IND_COMPS, VERTEX, SPLIT, LAYER>,
+    payloadFunction: Function<V, VERTEX_PAYLOAD>,
+    sortKeyFunction: Function<V, SORT_KEY>,
+) : DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS, VERTEX, SPLIT, LAYER, SORT_KEY>(
+    viewFactory,
+    payloadFunction,
+    sortKeyFunction
 ) {
-    fun doRender(graph: DAGraph<V>): COMP? {
+    override fun doRenderGraphWithEdges(graph: DAGraph<V>): COMP? {
         val decomposed = DAGraphDecomposer(graph).decompose()
         println("| doRender: graph decomposed into " + decomposed.size)
         val components = decomposed.entries
@@ -30,7 +34,7 @@ class DAGraphViewRendererDelegate1<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VE
             }
             .collect(Collectors.toList())
 
-        return when (val subGraphView = doRender(subGraph)) {
+        return when (val subGraphView = doRenderGraphWithEdges(subGraph)) {
             null -> viewFactory.independentCompsIfManyOrNullIfEmpty(rootsViews)
             else -> viewFactory.newSplit(rootsViews, subGraphView)
         }

@@ -4,15 +4,13 @@ import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
 import java.util.function.Function
 import java.util.stream.Collectors
 
-class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP, SORT_KEY : Comparable<SORT_KEY>?>(
-    private val graph: DAGraph<V>,
-    private val viewFactory: Factory<VERTEX_PAYLOAD, COMP, IND_COMPS, VERTEX, SPLIT, LAYER>,
-    private val payloadFunction: Function<V, VERTEX_PAYLOAD>,
-    private val sortKeyFunction: Function<V, SORT_KEY>,
-    private val delegate: Function<DAGraph<V>, COMP?>,
+abstract class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP, SORT_KEY : Comparable<SORT_KEY>?>(
+    protected val viewFactory: Factory<VERTEX_PAYLOAD, COMP, IND_COMPS, VERTEX, SPLIT, LAYER>,
+    protected val payloadFunction: Function<V, VERTEX_PAYLOAD>,
+    protected val sortKeyFunction: Function<V, SORT_KEY>,
 ) {
-    fun render(): COMP =
-        doRender(graph) ?: viewFactory.newIndependentComponents(listOf<COMP>())
+    fun render(daGraph: DAGraph<V>): COMP =
+        doRender(daGraph) ?: viewFactory.newIndependentComponents(listOf<COMP>())
 
     private fun doRender(graph: DAGraph<V>): COMP? {
         if (!graph.hasVertices()) return null
@@ -48,9 +46,11 @@ class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : CO
                 )
             }
         } else {
-            delegate.apply(graph)
+            doRenderGraphWithEdges(graph)
         }
     }
+
+    abstract fun doRenderGraphWithEdges(graph: DAGraph<V>): COMP?
 
     private fun vertexViews(graph: DAGraph<V>, isMultiVertex: Boolean, multiVertices: Set<V>): List<VERTEX> =
         graph.vertices()
