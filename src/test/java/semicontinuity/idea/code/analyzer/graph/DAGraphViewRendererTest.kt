@@ -1,31 +1,51 @@
-package semicontinuity.idea.code.analyzer.graph;
+package semicontinuity.idea.code.analyzer.graph
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
-import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VFactory;
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.Test
+import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VComponent
+import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VFactory
+import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VIndependentComponents
+import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VLayer
+import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VMember
+import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VSplit
+import java.util.function.Function
 
-class DAGraphViewRendererTest implements DAGraphImplTestData1, DAGraphImplTestData3, DAGraphImplTestData4 {
-
+internal class DAGraphViewRendererTest : DAGraphImplTestData1, DAGraphImplTestData3, DAGraphImplTestData4 {
     @Test
-    void render1() throws JsonProcessingException {
-        render(exampleGraph1());
+    @Throws(JsonProcessingException::class)
+    fun render1() {
+        render(exampleGraph1())
     }
 
     @Test
-    void render3() throws JsonProcessingException {
-        render(exampleGraph3());
+    @Throws(JsonProcessingException::class)
+    fun render3() {
+        render(exampleGraph3())
     }
 
     @Test
-    void render4() throws JsonProcessingException {
-        render(exampleGraph4());
+    @Throws(JsonProcessingException::class)
+    fun render4() {
+        render(exampleGraph4())
     }
 
-    private void render(DAGraph<String> graph) throws JsonProcessingException {
-        var renderer = new DAGraphViewRenderer<>(graph, new VFactory<>(), (String id) -> id, (String s) -> s);
+    @Throws(JsonProcessingException::class)
+    private fun render(graph: DAGraph<String>) {
+        val renderer =
+            DAGraphViewRenderer(
+                graph,
+                VFactory(),
+                { id: String -> id },
+                { s: String -> s },
+                DAGraphViewRendererDelegate(
+                    VFactory(),
+                    { id: String -> id },
+                    { s: String -> s },
+                )::doRender
+            )
 
-        var render = renderer.render();
-        System.out.println(new ObjectMapper().writeValueAsString(render));
+        val render = renderer.render()
+        println(ObjectMapper().writeValueAsString(render))
     }
 }

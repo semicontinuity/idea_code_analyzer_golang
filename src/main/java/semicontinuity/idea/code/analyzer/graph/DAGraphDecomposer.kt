@@ -4,6 +4,11 @@ import semicontinuity.idea.code.analyzer.util.CloseableConsumer
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+/**
+ * Cuts the graph into independent sub-graphs (so that one sub-graph cannot be reached from another).
+ *
+ * This implementation identifies strongly connected components and treats each as a separate subgraph.
+ */
 class DAGraphDecomposer<V>(
     private val graph: DAGraph<V>,
     private val log: CloseableConsumer<String> = CloseableConsumer.noOp(),

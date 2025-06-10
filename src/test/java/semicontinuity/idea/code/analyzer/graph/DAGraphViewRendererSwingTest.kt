@@ -1,59 +1,77 @@
-package semicontinuity.idea.code.analyzer.graph;
+package semicontinuity.idea.code.analyzer.graph
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
+import org.junit.jupiter.api.Test
+import semicontinuity.idea.code.analyzer.graph.viewModel.swing.SwingViewFactory
+import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VFactory
+import java.util.function.Function
+import javax.swing.JComponent
+import javax.swing.JFrame
+import javax.swing.WindowConstants
 
-import org.junit.jupiter.api.Test;
-import semicontinuity.idea.code.analyzer.graph.viewModel.swing.SwingViewFactory;
+internal class DAGraphViewRendererSwingTest
 
-class DAGraphViewRendererSwingTest
-        implements DAGraphImplTestData4, DAGraphImplTestData5, DAGraphImplTestData6, DAGraphImplTestData7 {
-    static {
-        System.setProperty("sun.java2d.uiScale", "4");
+    : DAGraphImplTestData4, DAGraphImplTestData5, DAGraphImplTestData6, DAGraphImplTestData7 {
+    @Test
+    @Throws(InterruptedException::class)
+    fun render4() {
+        show(exampleGraph4())
     }
 
     @Test
-    void render4() throws InterruptedException {
-        show(exampleGraph4());
+    @Throws(InterruptedException::class)
+    fun render5() {
+        show(exampleGraph5())
     }
 
     @Test
-    void render5() throws InterruptedException {
-        show(exampleGraph5());
-    }
-
-    @Test
-    void render6() throws InterruptedException {
-
+    @Throws(InterruptedException::class)
+    fun render6() {
         // WEIRD
         // See platform/services/sd/internal/storage
         // Correctly rendered here.
         // Incorrectly in GoLand.
-        show(exampleGraph6());
+
+        show(exampleGraph6())
     }
 
     @Test
-    void render7() throws InterruptedException {
-        show(exampleGraph7());
+    @Throws(InterruptedException::class)
+    fun render7() {
+        show(exampleGraph7())
     }
 
-    private void show(DAGraph<String> graph) throws InterruptedException {
-        var frame = frame(render(graph));
-        while (frame.isVisible()) Thread.sleep(100);
+    @Throws(InterruptedException::class)
+    private fun show(graph: DAGraph<String>) {
+        val frame = frame(render(graph))
+        while (frame.isVisible) Thread.sleep(100)
     }
 
-    private static JComponent render(DAGraph<String> graph) {
-        return new DAGraphViewRenderer<>(graph, new SwingViewFactory(), (String id) -> id, (String s) -> s).render();
-    }
+    companion object {
+        init {
+            System.setProperty("sun.java2d.uiScale", "4")
+        }
 
-    private static JFrame frame(JComponent contents) {
-        var f = new JFrame("test");
-        f.setContentPane(contents);
-        f.pack();
-        f.setLocationRelativeTo(null);
-        f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        f.setVisible(true);
-        return f;
+        private fun render(graph: DAGraph<String>): JComponent {
+            return DAGraphViewRenderer(
+                graph, SwingViewFactory(),
+                { id: String -> id },
+                { s: String -> s },
+                DAGraphViewRendererDelegate(
+                    SwingViewFactory(),
+                    { id: String -> id },
+                    { s: String -> s },
+                )::doRender,
+            ).render()
+        }
+
+        private fun frame(contents: JComponent): JFrame {
+            val f = JFrame("test")
+            f.contentPane = contents
+            f.pack()
+            f.setLocationRelativeTo(null)
+            f.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            f.isVisible = true
+            return f
+        }
     }
 }

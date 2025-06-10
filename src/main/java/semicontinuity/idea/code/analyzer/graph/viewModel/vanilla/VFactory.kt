@@ -4,6 +4,7 @@ import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
 
 class VFactory<PAYLOAD> :
     Factory<PAYLOAD, VComponent?, VIndependentComponents?, VMember<PAYLOAD>?, VSplit<PAYLOAD>?, VLayer?> {
+
     override fun newIndependentComponents(components: List<VComponent?>): VIndependentComponents {
         return VIndependentComponents(components)
     }

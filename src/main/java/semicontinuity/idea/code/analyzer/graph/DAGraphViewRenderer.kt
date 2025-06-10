@@ -9,6 +9,7 @@ class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : CO
     private val viewFactory: Factory<VERTEX_PAYLOAD, COMP, IND_COMPS, VERTEX, SPLIT, LAYER>,
     private val payloadFunction: Function<V, VERTEX_PAYLOAD>,
     private val sortKeyFunction: Function<V, SORT_KEY>,
+    private val delegate: Function<DAGraph<V>, COMP?>,
 ) {
     private val multiPredecessorVertices: Set<V> =
         graph.vertices().stream()
@@ -28,8 +29,8 @@ class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : CO
         return if (!graph.hasEdges()) {
             println("| doRender: no edges")
 
-            val direct = independentCompsIfManyOrNullIfEmpty(vertexViews(graph, false))
-            val shared = independentCompsIfManyOrNullIfEmpty(vertexViews(graph, true))
+            val direct = viewFactory.independentCompsIfManyOrNullIfEmpty(vertexViews(graph, false))
+            val shared = viewFactory.independentCompsIfManyOrNullIfEmpty(vertexViews(graph, true))
 
             when {
                 direct == null -> return shared
@@ -55,7 +56,7 @@ class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : CO
                     this.renderRootsWithSubgraph(roots, subGraph)
                 }
 
-            independentCompsIfManyOrNullIfEmpty(components)
+            viewFactory.independentCompsIfManyOrNullIfEmpty(components)
         }
     }
 
@@ -70,24 +71,10 @@ class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : CO
             .collect(Collectors.toList())
 
         return when (val subGraphView = doRender(subGraph)) {
-            null -> independentCompsIfManyOrNullIfEmpty(rootsViews)
+            null -> viewFactory.independentCompsIfManyOrNullIfEmpty(rootsViews)
             else -> viewFactory.newSplit(rootsViews, subGraphView)
         }
     }
-
-    private fun independentCompsIfManyOrNullIfEmpty(items: List<COMP?>): COMP? =
-        if (items.isEmpty()) {
-            null
-        } else {
-            independentCompsOrFirst(items)
-        }
-
-    private fun independentCompsOrFirst(items: List<COMP?>) =
-        if (items.size == 1) {
-            items[0]
-        } else {
-            viewFactory.newIndependentComponents(items)
-        }
 
     private fun vertexViews(graph: DAGraph<V>, isMultiVertex: Boolean): List<VERTEX> =
         graph.vertices()
