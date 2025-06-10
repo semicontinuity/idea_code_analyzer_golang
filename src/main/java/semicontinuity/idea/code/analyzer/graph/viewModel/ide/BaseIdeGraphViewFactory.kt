@@ -1,6 +1,5 @@
 package semicontinuity.idea.code.analyzer.graph.viewModel.ide
 
-import com.intellij.ui.JBColor
 import semicontinuity.idea.code.analyzer.graph.viewModel.Factory
 import java.awt.Color
 import javax.swing.BorderFactory
@@ -42,10 +41,9 @@ abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
 
     override fun newSplit(left: JComponent, right: JComponent) =
         Box.createHorizontalBox().apply {
-            // setBorder(border(JBColor.YELLOW))
-            setBorder(BorderFactory.createLineBorder(JBColor.LIGHT_GRAY))
             add(left)
-            add(right)
+            add(verticalBox(Color.GREEN, true, right))
+            add(Box.createHorizontalGlue())
         }
 
     override fun newLayer(directDeps: JComponent?, sharedDeps: JComponent?): JComponent {
@@ -86,28 +84,21 @@ abstract class BaseIdeGraphViewFactory<VERTEX_PAYLOAD> :
         return box
     }
 
-    fun directDepsBox(contents: JComponent?): JComponent {
+    fun directDepsBox(contents: JComponent) = verticalBox(Color.GREEN, false, contents)
+
+    fun sharedDepsBox(contents: JComponent) = verticalBox(Color.RED, true, contents)
+
+    private fun verticalBox(debugBorderColor: Color?, loweredBevel: Boolean, contents: JComponent): Box {
         val box = Box.createVerticalBox()
-
-        if (showDebugBorders) {
-            box.border = BorderFactory.createLineBorder(Color.GREEN)
-        } else {
-            box.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
-        }
-
-        box.add(Box.createVerticalGlue())
-        box.add(contents)
-        box.add(Box.createVerticalGlue())
-        return box
-    }
-
-    fun sharedDepsBox(contents: JComponent?): JComponent {
-        val box = Box.createVerticalBox()
-        if (showDebugBorders) {
-            box.border = BorderFactory.createLineBorder(Color.RED)
-        } else {
-            box.border = BorderFactory.createLoweredBevelBorder()
-        }
+        box.border =
+            if (showDebugBorders) {
+                BorderFactory.createLineBorder(debugBorderColor)
+            } else {
+                when (loweredBevel) {
+                    true -> BorderFactory.createLoweredBevelBorder()
+                    false -> BorderFactory.createEmptyBorder(1, 1, 1, 1)
+                }
+            }
 
         box.add(Box.createVerticalGlue())
         box.add(contents)

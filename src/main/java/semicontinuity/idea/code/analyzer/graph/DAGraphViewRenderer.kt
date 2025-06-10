@@ -77,4 +77,27 @@ abstract class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VE
                 viewFactory.newVertex(payloadFunction.apply(vertex))
             }
             .collect(Collectors.toList())
+
+
+    protected fun doRenderGraphLayers(graph: DAGraph<V>): COMP {
+        val decomposed = DAGraphDecomposer(graph).decompose()
+        val views = decomposed.entries
+            .map { (roots, subGraph) -> renderRootsWithSubgraph(roots, subGraph) }
+
+        return viewFactory.independentCompsOrFirst(views)
+    }
+
+    private fun renderRootsWithSubgraph(roots: Set<V>, subGraph: DAGraph<V>): COMP =
+        when (subGraph.hasVertices()) {
+            true -> viewFactory.newSplit(sortedVerticesViews(roots), doRenderNonEmptyGraph(subGraph))
+            false -> viewFactory.independentCompsOrFirst(sortedVerticesViews(roots))
+        }
+
+    private fun sortedVerticesViews(roots: Set<V>): List<VERTEX> =
+        roots.stream()
+            .sorted(Comparator.comparing<V, SORT_KEY>(sortKeyFunction))
+            .map { r: V ->
+                viewFactory.newVertex(payloadFunction.apply(r))
+            }
+            .collect(Collectors.toList())
 }

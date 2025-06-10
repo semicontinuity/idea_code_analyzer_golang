@@ -14,29 +14,6 @@ class DAGraphViewRenderer1<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : C
     sortKeyFunction
 ) {
     override fun doRenderGraphWithEdges(graph: DAGraph<V>): COMP {
-        val decomposed: Map<Set<V>, DAGraph<V>> = DAGraphDecomposer(graph).decompose()
-
-        val views = decomposed.entries
-            .map { (roots, subGraph) ->
-                this.renderRootsWithSubgraph(roots, subGraph)
-            }
-
-        return viewFactory.independentCompsOrFirst(views)
+        return doRenderGraphLayers(graph)
     }
-
-    private fun renderRootsWithSubgraph(roots: Set<V>, subGraph: DAGraph<V>): COMP =
-        when (subGraph.hasVertices()) {
-            true -> viewFactory.newSplit(sortedVerticesViews(roots), doRenderNonEmptyGraph(subGraph))
-            false -> viewFactory.independentCompsOrFirst(sortedVerticesViews(roots))
-        }
-
-    private fun sortedVerticesViews(roots: Set<V>): List<VERTEX> =
-        roots.stream()
-            .sorted(Comparator.comparing<V, SORT_KEY>(sortKeyFunction))
-            .map { r: V ->
-                val payload = payloadFunction.apply(r)
-                println(" renderRootsWithSubgraph: root=$payload")
-                viewFactory.newVertex(payload)
-            }
-            .collect(Collectors.toList())
 }

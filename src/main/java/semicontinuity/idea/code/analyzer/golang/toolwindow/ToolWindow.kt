@@ -16,6 +16,7 @@ import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter.split
 import semicontinuity.idea.code.analyzer.golang.StructureFiller
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer1
+import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer2
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.CoarseGraphViewFactory
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeButtonHighlightingDispatcher
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.MembersGraphViewFactory
@@ -159,7 +160,7 @@ class ToolWindow @Suppress("HardCodedStringLiteral") constructor(private val myP
             split.members, split.subGraphs, subGraphViewFactory!!, ideButtonHighlightingDispatcher!!
         )
 
-        val content = DAGraphViewRenderer1(
+        val content = DAGraphViewRenderer2(
             coarseGraphViewFactory,
             Function.identity(),
             Function.identity(),
