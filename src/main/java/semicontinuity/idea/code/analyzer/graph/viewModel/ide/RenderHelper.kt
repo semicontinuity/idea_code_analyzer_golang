@@ -4,7 +4,7 @@ import com.intellij.util.ui.UIUtil
 import semicontinuity.idea.code.analyzer.golang.Member
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
-import semicontinuity.idea.code.analyzer.graph.DAGraphViewRendererDelegate
+import semicontinuity.idea.code.analyzer.graph.DAGraphViewRendererDelegate1
 import java.awt.Dimension
 import java.util.function.Function
 import javax.swing.BorderFactory
@@ -82,7 +82,7 @@ object RenderHelper {
             viewFactory,
             Function.identity(),
             { obj: Member -> obj.name },
-            DAGraphViewRendererDelegate(
+            DAGraphViewRendererDelegate1(
                 viewFactory,
                 Function.identity(),
                 { obj: Member -> obj.name },

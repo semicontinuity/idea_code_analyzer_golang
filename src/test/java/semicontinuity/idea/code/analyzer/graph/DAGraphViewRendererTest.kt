@@ -3,13 +3,7 @@ package semicontinuity.idea.code.analyzer.graph
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
-import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VComponent
 import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VFactory
-import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VIndependentComponents
-import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VLayer
-import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VMember
-import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VSplit
-import java.util.function.Function
 
 internal class DAGraphViewRendererTest : DAGraphImplTestData1, DAGraphImplTestData3, DAGraphImplTestData4 {
     @Test
@@ -38,7 +32,7 @@ internal class DAGraphViewRendererTest : DAGraphImplTestData1, DAGraphImplTestDa
                 VFactory(),
                 { id: String -> id },
                 { s: String -> s },
-                DAGraphViewRendererDelegate(
+                DAGraphViewRendererDelegate1(
                     VFactory(),
                     { id: String -> id },
                     { s: String -> s },

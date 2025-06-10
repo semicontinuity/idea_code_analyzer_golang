@@ -2,8 +2,6 @@ package semicontinuity.idea.code.analyzer.graph
 
 import org.junit.jupiter.api.Test
 import semicontinuity.idea.code.analyzer.graph.viewModel.swing.SwingViewFactory
-import semicontinuity.idea.code.analyzer.graph.viewModel.vanilla.VFactory
-import java.util.function.Function
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.WindowConstants
@@ -56,7 +54,7 @@ internal class DAGraphViewRendererSwingTest
                 graph, SwingViewFactory(),
                 { id: String -> id },
                 { s: String -> s },
-                DAGraphViewRendererDelegate(
+                DAGraphViewRendererDelegate1(
                     SwingViewFactory(),
                     { id: String -> id },
                     { s: String -> s },

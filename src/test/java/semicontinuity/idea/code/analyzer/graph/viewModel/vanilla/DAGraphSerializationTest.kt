@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import semicontinuity.idea.code.analyzer.graph.DAGraph
 import semicontinuity.idea.code.analyzer.graph.DAGraphImplTestData7
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
-import semicontinuity.idea.code.analyzer.graph.DAGraphViewRendererDelegate
+import semicontinuity.idea.code.analyzer.graph.DAGraphViewRendererDelegate1
 
 class DAGraphSerializationTest : DAGraphImplTestData7 {
     @Test
@@ -22,7 +22,7 @@ class DAGraphSerializationTest : DAGraphImplTestData7 {
                 VFactory(),
                 { id: String -> id },
                 { s: String -> s },
-                DAGraphViewRendererDelegate(
+                DAGraphViewRendererDelegate1(
                     VFactory(),
                     { id: String -> id },
                     { s: String -> s },
