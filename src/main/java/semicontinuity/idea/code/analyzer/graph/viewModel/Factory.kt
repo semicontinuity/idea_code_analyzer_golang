@@ -2,19 +2,21 @@ package semicontinuity.idea.code.analyzer.graph.viewModel
 
 interface Factory<VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : COMP, SPLIT : COMP, LAYER : COMP, SPLIT0 : COMP> {
 
-    fun independentCompsIfManyOrNullIfEmpty(items: List<COMP?>): COMP? =
+    fun independentCompsIfManyOrFirstIfSingleOrNullIfEmpty(items: List<COMP>): COMP? =
         if (items.isEmpty()) {
             null
         } else {
             independentCompsOrFirst(items)
         }
 
-    fun independentCompsOrFirst(items: List<COMP?>) =
+    fun independentCompsOrFirst(items: List<COMP>): COMP =
         if (items.size == 1) {
             items[0]
         } else {
             newIndependentComponents(items)
         }
+
+    fun empty(): COMP = newIndependentComponents(listOf<COMP>())
 
     fun newIndependentComponents(components: List<COMP?>): IND_COMPS
 

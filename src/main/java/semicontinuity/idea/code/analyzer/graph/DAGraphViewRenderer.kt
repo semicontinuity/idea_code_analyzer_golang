@@ -10,11 +10,13 @@ abstract class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VE
     protected val sortKeyFunction: Function<V, SORT_KEY>,
 ) {
     fun render(daGraph: DAGraph<V>): COMP =
-        doRender(daGraph) ?: viewFactory.newIndependentComponents(listOf<COMP>())
+        doRender(daGraph) ?: viewFactory.empty()
 
-    private fun doRender(graph: DAGraph<V>): COMP? {
-        if (!graph.hasVertices()) return null
+    protected fun doRender(graph: DAGraph<V>): COMP? =
+        if (graph.hasVertices()) doRenderNonEmptyGraph(graph)
+        else null
 
+    protected fun doRenderNonEmptyGraph(graph: DAGraph<V>): COMP {
         println("=================================================================================================")
         println("doRender graph; " + graph.vertexCount() + " vertices=" + graph.vertices())
         println("=================================================================================================")
@@ -26,23 +28,29 @@ abstract class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VE
         }
     }
 
-    abstract fun doRenderGraphWithEdges(graph: DAGraph<V>): COMP?
+    /**
+     * @param graph non-empty graph
+     */
+    abstract fun doRenderGraphWithEdges(graph: DAGraph<V>): COMP
 
-    private fun doRenderGraphWithoutEdges(graph: DAGraph<V>): COMP? {
+    /**
+     * @param graph non-empty graph
+     */
+    private fun doRenderGraphWithoutEdges(graph: DAGraph<V>): COMP {
         println("| doRender: no edges")
         val multiPredecessorVertices: Set<V> =
             graph.vertices().stream()
                 .filter { v: V -> graph.predecessorCount(v) > 1 }
                 .collect(Collectors.toSet())
 
-        val direct = viewFactory.independentCompsIfManyOrNullIfEmpty(
+        val direct = viewFactory.independentCompsIfManyOrFirstIfSingleOrNullIfEmpty(
             vertexViews(
                 graph,
                 false,
                 multiPredecessorVertices
             )
         )
-        val shared = viewFactory.independentCompsIfManyOrNullIfEmpty(
+        val shared = viewFactory.independentCompsIfManyOrFirstIfSingleOrNullIfEmpty(
             vertexViews(
                 graph,
                 true,
@@ -51,7 +59,7 @@ abstract class DAGraphViewRenderer<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VE
         )
 
         return when {
-            direct == null -> shared
+            direct == null -> shared!!
             shared == null -> direct
             else -> viewFactory.newLayer(
                 direct,

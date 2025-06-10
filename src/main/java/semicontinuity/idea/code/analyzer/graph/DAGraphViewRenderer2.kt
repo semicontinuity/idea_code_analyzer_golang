@@ -12,8 +12,20 @@ class DAGraphViewRenderer2<V, VERTEX_PAYLOAD, COMP, IND_COMPS : COMP, VERTEX : C
     payloadFunction,
     sortKeyFunction
 ) {
-    override fun doRenderGraphWithEdges(graph: DAGraph<V>): COMP? {
-        val decomposed = DAGraphCutter(graph).cut()
-        return null
+    override fun doRenderGraphWithEdges(graph: DAGraph<V>): COMP {
+        return viewFactory.independentCompsOrFirst(DAGraphCutter(graph).cut().map { doRenderConnectedGraph(it) })
+    }
+
+    private fun doRenderConnectedGraph(graph: DAGraph<V>): COMP {
+        val (front, back) = DAGraphSegregator(graph).segregate()
+
+        return when {
+            !front.hasVertices() -> doRenderNonEmptyGraph(back)
+            !back.hasVertices() -> doRenderNonEmptyGraph(front)
+            else -> viewFactory.newSplit(
+                doRenderNonEmptyGraph(back),
+                doRenderNonEmptyGraph(back)
+            )
+        }
     }
 }

@@ -15,7 +15,6 @@ import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter
 import semicontinuity.idea.code.analyzer.golang.CallGraphSplitter.split
 import semicontinuity.idea.code.analyzer.golang.StructureFiller
 import semicontinuity.idea.code.analyzer.graph.DAGraphImpl
-import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer
 import semicontinuity.idea.code.analyzer.graph.DAGraphViewRenderer1
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.CoarseGraphViewFactory
 import semicontinuity.idea.code.analyzer.graph.viewModel.ide.IdeButtonHighlightingDispatcher
